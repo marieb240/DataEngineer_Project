@@ -3,3 +3,5 @@ flask
 pymongo
 redis
 elasticsearch
+gunicorn
+
