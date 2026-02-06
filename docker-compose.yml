@@ -1,7 +1,7 @@
 services:
   mongo:
     image: mongo:7
-    container_name: numbeo_mongo
+    container_name: vidiq_mongo
     restart: unless-stopped
     ports:
       - "27017:27017"
@@ -9,11 +9,30 @@ services:
       - mongo_data:/data/db
     env_file:
       - .env
-    # TODO: ajouter healthcheck plus tard si besoin
+    healthcheck:
+      test: mongosh --eval "db.adminCommand('ping')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  scraper:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.scraper
+    container_name: vidiq_scraper
+    restart: on-failure
+    env_file:
+      - .env
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ./app:/app/app
+      - ./scrapers:/app/scrapers
 
   web:
     build: ./app
-    container_name: numbeo_web
+    container_name: vidiq_web
     restart: unless-stopped
     ports:
       - "5000:5000"
@@ -21,9 +40,12 @@ services:
       - .env
     depends_on:
       - mongo
+      - scraper
     volumes:
       - ./app:/app
-    # hot reload activé avec le volume mount
+    environment:
+      - FLASK_APP=main.py
+      - FLASK_ENV=production
 
 volumes:
   mongo_data:
