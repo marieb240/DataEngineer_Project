@@ -29,6 +29,7 @@ services:
     volumes:
       - ./app:/app/app
       - ./scrapers:/app/scrapers
+      - ./data:/app/data
 
   web:
     build: ./app

@@ -5,7 +5,6 @@ Utilise BeautifulSoup comme dans le cours Part4.
 
 from bs4 import BeautifulSoup
 from typing import List, Dict
-import re
 
 
 class VidIQParser:
@@ -71,6 +70,21 @@ class VidIQParser:
                 videos = cells[2].get_text(strip=True)
                 subscribers = cells[3].get_text(strip=True)
                 total_views = cells[4].get_text(strip=True)
+
+                # Cherche l'URL VidIQ de la chaîne (page détail) via le href d'un <a>
+                # Exemple : <a href="/fr/youtube-stats/channel/UCX6OQ3DkcsbYNE6H8uQQuVA">
+                channel_url = None
+                all_links = row.find_all('a', href=True)
+                
+                for link in all_links:
+                    href = link.get('href', '')
+                    if '/youtube-stats/channel/' in href:
+                        # Construit l'URL complète (urljoin équivalent)
+                        if href.startswith('/'):
+                            channel_url = f"https://vidiq.com{href}"
+                        else:
+                            channel_url = href
+                        break
                 
                 # Nettoie et convertit les nombres
                 rank = int(rank_text.replace('#', ''))
@@ -81,6 +95,8 @@ class VidIQParser:
                 channel = {
                     'rank': rank,
                     'name': name,
+                    'channel_name': name,
+                    'channel_url': channel_url,
                     'videos': videos,
                     'subscribers': subscribers,
                     'total_views': total_views,
