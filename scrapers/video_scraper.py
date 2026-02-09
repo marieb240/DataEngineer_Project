@@ -97,7 +97,6 @@ class VideoScraper:
                         "videos",
                         "subscribers",
                         "total_views",
-                        "country",
                         "scraped_at",
                     ],
                 )
@@ -110,7 +109,6 @@ class VideoScraper:
                         "videos": channel.get("videos"),
                         "subscribers": channel.get("subscribers"),
                         "total_views": channel.get("total_views"),
-                        "country": channel.get("country"),
                         "scraped_at": scraped_at.isoformat(),
                     })
 
