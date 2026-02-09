@@ -15,15 +15,26 @@ while ! mongosh --host mongo --username $MONGO_USER --password $MONGO_PASSWORD -
 done
 echo "✓ MongoDB est opérationnel"
 
-# Vérifier si les données existent déjà
-echo "🔍 Vérification des données..."
-COLLECTION_COUNT=$(mongosh --host mongo --username $MONGO_USER --password $MONGO_PASSWORD --eval "use $MONGO_DB; db.channels.countDocuments({})" --quiet)
+# Vérifier si les données top100 existent déjà
+echo "🔍 Vérification des données Top100..."
+TOP100_COUNT=$(mongosh --host mongo --username $MONGO_USER --password $MONGO_PASSWORD --eval "use $MONGO_DB; db.channels_top100.countDocuments({})" --quiet)
 
-if [ "$COLLECTION_COUNT" -eq 0 ]; then
-    echo "📥 Lancement du scraper..."
+if [ "$TOP100_COUNT" -eq 0 ]; then
+    echo "📥 Lancement du scraping Top100..."
     python seed_db.py
 else
-    echo "✓ Données déjà présentes ($COLLECTION_COUNT documents)"
+    echo "✓ Top100 déjà présent ($TOP100_COUNT documents)"
+fi
+
+# Vérifier si les données enrichies existent déjà
+echo "🔍 Vérification des données enrichies..."
+ENRICHED_COUNT=$(mongosh --host mongo --username $MONGO_USER --password $MONGO_PASSWORD --eval "use $MONGO_DB; db.channels_enriched.countDocuments({})" --quiet)
+
+if [ "$ENRICHED_COUNT" -eq 0 ]; then
+    echo "✨ Lancement de l'enrichissement..."
+    python scrapers/vidiq_enrich.py
+else
+    echo "✓ Enrichissement déjà présent ($ENRICHED_COUNT documents)"
 fi
 
 echo "=================================================="

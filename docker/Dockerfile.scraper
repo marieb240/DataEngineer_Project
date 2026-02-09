@@ -9,5 +9,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copie du code
 COPY . .
 
-# Lance le scraper
-CMD ["python", "seed_db.py"]
+# Script d'orchestration
+RUN chmod +x /app/entrypoint.sh
+
+# Lance les deux phases (top100 + enrichissement)
+CMD ["/bin/bash", "/app/entrypoint.sh"]
