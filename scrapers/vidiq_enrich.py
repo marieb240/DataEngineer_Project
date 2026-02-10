@@ -162,9 +162,14 @@ def export_csv(rows: List[Dict]):
     """Export du CSV enrichi."""
     os.makedirs(ENRICHED_DIR, exist_ok=True)
 
-    fieldnames = list(rows[0].keys()) if rows else []
-    if not fieldnames:
+    if not rows:
         return
+
+    # Union de toutes les clés pour éviter les champs manquants
+    fieldnames_set = set()
+    for row in rows:
+        fieldnames_set.update(row.keys())
+    fieldnames = list(fieldnames_set)
 
     with open(ENRICHED_CSV_PATH, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
