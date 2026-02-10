@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Toutes les chaînes - VidIQ Stats{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <h1>📺 Toutes les chaînes ({{ total }})</h1>
+        <p class="text-muted">Page {{ page }} sur {{ total_pages }}</p>
+    </div>
+</div>
+
+<!-- Tableau des chaînes -->
+<div class="row">
+    <div class="col-lg-12">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Chaîne</th>
+                        <th>Vidéos</th>
+                        <th>Abonnés</th>
+                        <th>Vues totales</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for channel in channels %}
+                    <tr>
+                        <td>
+                            <span class="badge bg-danger">{{ channel.rank }}</span>
+                        </td>
+                        <td>
+                            <strong>{{ channel.name }}</strong>
+                        </td>
+                        <td>
+                            {{ "{:,}".format(channel.videos) }}
+                        </td>
+                        <td>
+                            <span class="badge badge-subscribers">
+                                {{ "{:,.0f}".format(channel.subscribers / 1000000) }}M
+                            </span>
+                        </td>
+                        <td>
+                            {{ "{:,.0f}".format(channel.total_views / 1000000000) }}B
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+<div class="row mt-4">
+    <div class="col-lg-12 d-flex justify-content-center">
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="/channels?page=1">Première</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="/channels?page={{ page - 1 }}">Précédente</a>
+                </li>
+                {% endif %}
+                
+                <!-- Pages numérotées -->
+                {% set start_page = [1, page - 2] | max %}
+                {% set end_page = [total_pages, page + 2] | min %}
+                
+                {% for p in range(start_page, end_page + 1) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link" href="/channels?page={{ p }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+                
+                {% if page < total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="/channels?page={{ page + 1 }}">Suivante</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="/channels?page={{ total_pages }}">Dernière</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+
+{% endblock %}

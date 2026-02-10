@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}{{ channel.name }} - Fiche chaîne{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <h1>📌 {{ channel.name }}</h1>
+        <p class="text-muted">Rang #{{ channel.rank }}</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="stat-box">
+            <div class="stat-label">Abonnés</div>
+            <div class="stat-number">{{ "{:,}".format(channel.subscribers or 0) }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-box">
+            <div class="stat-label">Vues totales</div>
+            <div class="stat-number">{{ "{:,}".format(channel.total_views or 0) }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-box">
+            <div class="stat-label">Vidéos</div>
+            <div class="stat-number">{{ "{:,}".format(channel.videos or 0) }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">🧾 Informations complémentaires</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>Revenus mensuels estimés :</strong>
+                        {{ channel.estimated_monthly_earnings or 'Non disponible' }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Durée moyenne des vidéos :</strong>
+                        {{ channel.avg_video_duration or 'Non disponible' }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Date de création :</strong>
+                        {{ channel.created_date or 'Non disponible' }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Description :</strong>
+                        {{ channel.description or 'Non disponible' }}
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Liens sociaux :</strong>
+                        {% if channel.social_links %}
+                            <ul>
+                                {% for link in channel.social_links %}
+                                    <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            Non disponible
+                        {% endif %}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <a class="btn btn-outline-secondary" href="/channels">← Retour</a>
+        {% if channel.detail_url %}
+            <a class="btn btn-danger" href="{{ channel.detail_url }}" target="_blank">Voir sur VidIQ</a>
+        {% endif %}
+        {% if channel.url %}
+            <a class="btn btn-outline-danger" href="{{ channel.url }}" target="_blank">Voir sur YouTube</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

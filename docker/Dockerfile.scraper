@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/playwright/python:v1.41.2-jammy
+
+WORKDIR /app
+
+# Installation des dépendances
+COPY app/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copie du code
+COPY . .
+
+# Lance le scraper
+CMD ["python", "seed_db.py"]

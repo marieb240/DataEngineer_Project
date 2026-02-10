@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Statistiques - VidIQ Stats{% endblock %}
+
+{% block extra_css %}
+<style>
+    .chart-container {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <h1>📊 Statistiques et Graphiques</h1>
+        <p class="text-muted">Visualisation des données des 100 chaînes YouTube</p>
+    </div>
+</div>
+
+<!-- Graphique 1: Top 10 par abonnés -->
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="chart-container">
+            <h4>👥 Top 10 par abonnés</h4>
+            <div id="chart-subscribers"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Graphique 2: Top 10 par vues -->
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="chart-container">
+            <h4>🔥 Top 10 par vues totales</h4>
+            <div id="chart-views"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Graphique 3: Corrélation -->
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="chart-container">
+            <h4>📈 Corrélation: Abonnés vs Vues</h4>
+            <div id="chart-correlation"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Données depuis Python
+const top_subs = {{ top_subs | tojson }};
+const top_views = {{ top_views | tojson }};
+
+// ========== Graphique 1: Top 10 par abonnés ==========
+const trace_subs = {
+    x: top_subs.map(c => c.subscribers / 1000000),
+    y: top_subs.map(c => c.name),
+    type: 'bar',
+    orientation: 'h',
+    marker: { color: '#ff0000' }
+};
+
+const layout_subs = {
+    title: '',
+    xaxis: { title: 'Abonnés (millions)' },
+    yaxis: { title: '' },
+    height: 400,
+    margin: { l: 200, r: 50, t: 30, b: 50 }
+};
+
+Plotly.newPlot('chart-subscribers', [trace_subs], layout_subs, { responsive: true });
+
+// ========== Graphique 2: Top 10 par vues ==========
+const trace_views = {
+    x: top_views.map(c => c.total_views / 1000000000),
+    y: top_views.map(c => c.name),
+    type: 'bar',
+    orientation: 'h',
+    marker: { color: '#0066cc' }
+};
+
+const layout_views = {
+    title: '',
+    xaxis: { title: 'Vues totales (milliards)' },
+    yaxis: { title: '' },
+    height: 400,
+    margin: { l: 200, r: 50, t: 30, b: 50 }
+};
+
+Plotly.newPlot('chart-views', [trace_views], layout_views, { responsive: true });
+
+// ========== Graphique 3: Corrélation Abonnés vs Vues ==========
+// Utilise tous les top_subs (qui contient aussi les données pour la corrélation)
+const all_channels = top_subs; // ou tu pourrais faire un appel API pour tous les 100
+
+const trace_corr = {
+    x: all_channels.map(c => c.subscribers / 1000000),
+    y: all_channels.map(c => c.total_views / 1000000000),
+    mode: 'markers',
+    type: 'scatter',
+    marker: {
+        size: 8,
+        color: '#ff0000',
+        opacity: 0.6,
+        line: { color: 'white', width: 1 }
+    },
+    text: all_channels.map(c => c.name),
+    hovertemplate: '<b>%{text}</b><br>Abonnés: %{x:.0f}M<br>Vues: %{y:.0f}B<extra></extra>'
+};
+
+const layout_corr = {
+    title: '',
+    xaxis: { title: 'Abonnés (millions)' },
+    yaxis: { title: 'Vues totales (milliards)' },
+    height: 500,
+    hovermode: 'closest'
+};
+
+Plotly.newPlot('chart-correlation', [trace_corr], layout_corr, { responsive: true });
+</script>
+{% endblock %}

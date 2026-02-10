@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Top 10 - VidIQ Stats{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <h1>👑 Top 10 des chaînes YouTube</h1>
+        <p class="text-muted">Les 10 chaînes YouTube les plus populaires</p>
+    </div>
+</div>
+
+<!-- Affichage sous forme de cartes pour le top 10 -->
+<div class="row">
+    {% for channel in channels %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <!-- Médaille pour le rang -->
+                <div class="text-center mb-3">
+                    {% if channel.rank == 1 %}
+                        <span style="font-size: 3rem;">🥇</span>
+                    {% elif channel.rank == 2 %}
+                        <span style="font-size: 3rem;">🥈</span>
+                    {% elif channel.rank == 3 %}
+                        <span style="font-size: 3rem;">🥉</span>
+                    {% else %}
+                        <span class="badge bg-dark" style="font-size: 1.2rem;">{{ channel.rank }}</span>
+                    {% endif %}
+                </div>
+                
+                <h5 class="card-title text-center">{{ channel.name }}</h5>
+                
+                <hr>
+                
+                <div class="mb-2">
+                    <small class="text-muted">Abonnés</small>
+                    <div class="fw-bold" style="color: #ff0000;">
+                        {{ "{:,.0f}".format(channel.subscribers / 1000000) }}M
+                    </div>
+                </div>
+                
+                <div class="mb-2">
+                    <small class="text-muted">Vues totales</small>
+                    <div class="fw-bold">
+                        {{ "{:,.0f}".format(channel.total_views / 1000000000) }}B
+                    </div>
+                </div>
+                
+                <div>
+                    <small class="text-muted">Vidéos</small>
+                    <div class="fw-bold">
+                        {{ "{:,}".format(channel.videos) }}
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <!-- Barre de progression pour les abonnés -->
+                <small class="text-muted">Comparé au #1</small>
+                <div class="progress mt-2" style="height: 8px;">
+                    <div 
+                        class="progress-bar bg-danger" 
+                        role="progressbar" 
+                        style="width: {{ (channel.subscribers / channels[0].subscribers * 100) }}%"
+                    ></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Tableau comparatif -->
+<div class="row mt-5">
+    <div class="col-lg-12">
+        <h3>📊 Vue détaillée</h3>
+        
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Rang</th>
+                        <th>Chaîne</th>
+                        <th>Abonnés</th>
+                        <th>Vues</th>
+                        <th>Vidéos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for channel in channels %}
+                    <tr>
+                        <td>
+                            <strong class="text-danger">#{{ channel.rank }}</strong>
+                        </td>
+                        <td>{{ channel.name }}</td>
+                        <td>
+                            <span class="badge badge-subscribers">
+                                {{ "{:,.0f}".format(channel.subscribers / 1000000) }}M
+                            </span>
+                        </td>
+                        <td>{{ "{:,.0f}".format(channel.total_views / 1000000000) }}B</td>
+                        <td>{{ "{:,}".format(channel.videos) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
