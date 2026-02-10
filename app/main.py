@@ -1,8 +1,3 @@
-"""
-Application Flask pour visualiser les données YouTube scraped.
-Routes pour : accueil, liste, recherche, graphiques, API JSON.
-"""
-
 from flask import Flask, render_template, request, jsonify
 from pymongo import MongoClient
 import os
@@ -11,7 +6,7 @@ import statistics
 
 app = Flask(__name__)
 
-# Config MongoDB
+# Configuration MongoDB
 MONGO_CONFIG = {
     'host': os.getenv("MONGO_HOST", "mongo"),
     'port': int(os.getenv("MONGO_PORT", "27017")),
@@ -21,14 +16,14 @@ MONGO_CONFIG = {
 }
 
 def get_db():
-    """Retourne la database MongoDB."""
+    """Retourne la database MongoDB"""
     connection_string = f"mongodb://{MONGO_CONFIG['user']}:{MONGO_CONFIG['pwd']}@{MONGO_CONFIG['host']}:{MONGO_CONFIG['port']}/?authSource=admin"
     client = MongoClient(connection_string)
     return client[MONGO_CONFIG['db']]
 
 
 def add_derived_metrics(channels):
-    """Ajoute des métriques dérivées pour les insights."""
+    """Ajoute des métriques dérivées pour les insights"""
     for ch in channels:
         subscribers = ch.get("subscribers", 0) or 0
         total_views = ch.get("total_views", 0) or 0
@@ -39,10 +34,6 @@ def add_derived_metrics(channels):
         ch["subs_per_video"] = (subscribers / videos) if videos else 0
     return channels
 
-
-# ============================================================================
-# ROUTES
-# ============================================================================
 
 @app.route("/")
 def home():
