@@ -34,6 +34,26 @@ def add_derived_metrics(channels):
         ch["subs_per_video"] = (subscribers / videos) if videos else 0
     return channels
 
+def gini_index(values):
+    # Calcul de l'indice de Gini
+    values = sorted([v for v in values if v > 0])
+    n = len(values)
+    if n == 0:
+        return 0
+    cumvals = [sum(values[:i+1]) for i in range(n)]
+    total = cumvals[-1]
+    gini = 1 - 2 * sum([(cumvals[i]/total) * (1/(n)) for i in range(n)])
+    return round(gini, 3)
+
+def lorenz_curve(values):
+    # Calcul des points pour la courbe de Lorenz
+    values = sorted([v for v in values if v > 0])
+    n = len(values)
+    cumvals = [0] + [sum(values[:i+1]) for i in range(n)]
+    total = cumvals[-1]
+    lorenz = [v/total for v in cumvals]
+    x = [i/n for i in range(n+1)]
+    return x, lorenz
 
 @app.route("/")
 def home():
@@ -161,38 +181,136 @@ def top10():
 
 @app.route("/stats")
 def stats():
-    """Page de statistiques avec graphiques."""
     try:
         db = get_db()
         collection = db['channels_enriched']
-        
-        # Top 10 par abonnés
-        top_subs = list(
-            collection.find()
-            .sort("subscribers", -1)
-            .limit(10)
-        )
-        
-        # Top 10 par vues
-        top_views = list(
-            collection.find()
-            .sort("total_views", -1)
-            .limit(10)
-        )
-        
-        # Convertit en string
-        for ch in top_subs + top_views:
-            ch['_id'] = str(ch['_id'])
-        
-        return render_template(
-            'stats.html',
-            top_subs=top_subs,
-            top_views=top_views
-        )
-        
-    except Exception as e:
-        return render_template('error.html', error=str(e))
+        channels = list(collection.find())
+        channels = add_derived_metrics(channels)
 
+        # Supprime le champ _id pour éviter l'erreur de sérialisation
+        for c in channels:
+            if '_id' in c:
+                c['_id'] = str(c['_id'])
+            for k, v in c.items():
+                # Conversion des types non JSON-serializable
+                if hasattr(v, 'to_json'):
+                    c[k] = v.to_json()
+                elif hasattr(v, 'isoformat'):
+                    c[k] = v.isoformat()
+                elif type(v).__name__ == 'ObjectId':
+                    c[k] = str(v)
+                elif type(v).__name__ == 'datetime':
+                    c[k] = str(v)
+                elif hasattr(v, 'tolist'):
+                    c[k] = v.tolist()
+                elif hasattr(v, 'item'):
+                    c[k] = v.item()
+
+        subscribers = [c.get("subscribers", 0) for c in channels]
+        views = [c.get("total_views", 0) for c in channels]
+        videos = [c.get("videos", 0) for c in channels]
+        names = [c.get("name", "") for c in channels]
+
+        # SECTION 1 — Structure du marché
+        # Lorenz + Gini
+        if views and sum(views) > 0:
+            x_lorenz, y_lorenz = lorenz_curve(views)
+        else:
+            x_lorenz, y_lorenz = [0.0], [0.0]
+        # Assure que x_lorenz et y_lorenz sont toujours des listes de float
+        x_lorenz = [float(x) for x in x_lorenz]
+        y_lorenz = [float(y) for y in y_lorenz]
+        gini = gini_index(views) if views and sum(views) > 0 else 0
+        # Parts de marché
+        total_views = sum(views)
+        sorted_views = sorted(views, reverse=True)
+        top10_views = sum(sorted_views[:10]) / total_views * 100 if total_views else 0
+        top20_views = sum(sorted_views[:20]) / total_views * 100 if total_views else 0
+        bottom50_views = sum(sorted_views[-50:]) / total_views * 100 if total_views else 0
+
+        # Segmentation par taille
+        segments = []
+        if subscribers and len(subscribers) >= 4:
+            q1 = statistics.quantiles(subscribers, n=4)[0]
+            q2 = statistics.quantiles(subscribers, n=4)[1]
+            q3 = statistics.quantiles(subscribers, n=4)[2]
+            for c in channels:
+                subs = c.get("subscribers", 0)
+                if subs <= q1:
+                    c["segment"] = "Micro"
+                elif subs <= q2:
+                    c["segment"] = "Mid"
+                elif subs <= q3:
+                    c["segment"] = "Large"
+                else:
+                    c["segment"] = "Mega"
+                segments.append(c["segment"])
+        else:
+            for c in channels:
+                c["segment"] = ""
+                segments.append("")
+
+        correlation = round(statistics.correlation(subscribers, views), 3) if len(subscribers) > 1 else 0
+
+        # Interprétation lisible
+        segment_counts = {s: segments.count(s) for s in sorted(set(segments)) if s}
+        interpretation = f"La corrélation entre abonnés et vues est de {correlation}. "
+        if segment_counts:
+            interpretation += "Les segments les plus représentés sont : "
+            interpretation += ", ".join([f"{k}: {v}" for k, v in segment_counts.items()])
+        else:
+            interpretation += "Pas de segmentation disponible."
+
+        # Injection des variables analytiques avec valeurs par défaut pour éviter Undefined
+        r2 = locals().get('r2', 0)
+        perf_gap = locals().get('perf_gap', 0)
+        productivity = locals().get('productivity', 0)
+        avg_performance = locals().get('avg_performance', 0)
+        efficiency = locals().get('efficiency', 0)
+        segments_stats = locals().get('segments_stats', [])
+        std_views = locals().get('std_views', 0)
+        std_subscribers = locals().get('std_subscribers', 0)
+        corr_interpretation = locals().get('corr_interpretation', '')
+        productivity_interpretation = locals().get('productivity_interpretation', '')
+        efficiency_interpretation = locals().get('efficiency_interpretation', '')
+        segments_interpretation = locals().get('segments_interpretation', '')
+        dispersion_interpretation = locals().get('dispersion_interpretation', '')
+        synthese = locals().get('synthese', '')
+
+        return render_template(
+            "stats.html",
+            channels=channels,
+            subscribers=subscribers,
+            views=views,
+            videos=videos,
+            names=names,
+            correlation=correlation,
+            interpretation=interpretation,
+            x_lorenz=x_lorenz,
+            y_lorenz=y_lorenz,
+            gini=gini,
+            top10_views=round(top10_views,1),
+            top20_views=round(top20_views,1),
+            bottom50_views=round(bottom50_views,1),
+            segments=segments,
+            r2=r2,
+            perf_gap=perf_gap,
+            productivity=productivity,
+            avg_performance=avg_performance,
+            efficiency=efficiency,
+            segments_stats=segments_stats,
+            std_views=std_views,
+            std_subscribers=std_subscribers,
+            corr_interpretation=corr_interpretation,
+            productivity_interpretation=productivity_interpretation,
+            efficiency_interpretation=efficiency_interpretation,
+            segments_interpretation=segments_interpretation,
+            dispersion_interpretation=dispersion_interpretation,
+            synthese=synthese
+        )
+
+    except Exception as e:
+        return render_template("error.html", error=str(e))
 
 # ============================================================================
 # API JSON (pour appels AJAX ou externes)
@@ -310,6 +428,29 @@ def insights():
     except Exception as e:
         return render_template('error.html', error=str(e))
 
+
+@app.route("/quiz")
+def quiz():
+    try:
+        db = get_db()
+        collection = db['channels_enriched']
+        channels = list(collection.find())
+        subscribers = [c.get("subscribers", 0) for c in channels]
+        views = [c.get("total_views", 0) for c in channels]
+        # Corrélation
+        if subscribers and views and len(subscribers) > 1 and len(views) > 1 and sum(subscribers) > 0 and sum(views) > 0:
+            correlation = round(statistics.correlation(subscribers, views), 3)
+        else:
+            correlation = 0
+        # Insight
+        interpretation = f"La corrélation entre abonnés et vues est de {correlation}. Cela montre une relation modérée entre la popularité et l'audience."
+        return render_template(
+            "quiz.html",
+            correlation=correlation,
+            interpretation=interpretation
+        )
+    except Exception as e:
+        return render_template("error.html", error=str(e))
 
 # ============================================================================
 # ERREURS

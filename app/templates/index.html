@@ -1,92 +1,81 @@
 {% extends "base.html" %}
 
-{% block title %}Accueil - VidIQ Stats{% endblock %}
+{% block title %}Dashboard - VidIQ Analytics{% endblock %}
 
 {% block content %}
-<div class="row mb-5">
-    <div class="col-lg-12">
-        <h1 class="mb-3">🎬 VidIQ YouTube Top 100</h1>
-        <p class="text-muted">Explorez les 100 chaînes YouTube les plus populaires au monde avec statistiques en temps réel.</p>
-    </div>
-</div>
 
-<!-- Statistiques principales -->
-<div class="row">
+<h1 class="mb-4">📊 Dashboard Global</h1>
+<p class="text-secondary mb-5">
+Analyse des 100 chaînes YouTube les plus populaires.
+</p>
+
+<!-- KPI CARDS -->
+<div class="row g-4 mb-5">
+
     <div class="col-md-4">
-        <div class="stat-box">
-            <div class="stat-label">Chaînes scrapées</div>
+        <div class="card-dark">
+            <div class="text-secondary">Chaînes scrapées</div>
             <div class="stat-number">{{ stats.total_channels }}</div>
         </div>
     </div>
-    
+
     <div class="col-md-4">
-        <div class="stat-box">
-            <div class="stat-label">👑 Plus d'abonnés</div>
-            <div class="stat-number" style="font-size: 1.2rem;">{{ stats.top_subscriber.name }}</div>
-            <small class="text-muted">{{ "{:,}".format(stats.top_subscriber.subscribers) }} abonnés</small>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="stat-box">
-            <div class="stat-label">🔥 Plus de vues</div>
-            <div class="stat-number" style="font-size: 1.2rem;">{{ stats.top_views.name }}</div>
-            <small class="text-muted">{{ "{:,}".format(stats.top_views.total_views) }} vues</small>
-        </div>
-    </div>
-</div>
-
-<!-- Boutons d'action -->
-<div class="row mt-5">
-    <div class="col-md-3">
-        <a href="/top10" class="btn btn-danger btn-lg w-100">
-            <i class="bi bi-trophy"></i> Top 10
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a href="/channels" class="btn btn-outline-danger btn-lg w-100">
-            Toutes les chaînes
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a href="/insights" class="btn btn-outline-danger btn-lg w-100">
-            🧠 Insights
-        </a>
-    </div>
-    <div class="col-md-3">
-        <a href="/api/channels" class="btn btn-outline-secondary btn-lg w-100">
-            API JSON
-        </a>
-    </div>
-</div>
-
-<div class="row mt-3">
-    <div class="col-md-3">
-        <a href="/stats" class="btn btn-outline-danger btn-lg w-100">
-            📊 Statistiques
-        </a>
-    </div>
-</div>
-
-<!-- Information -->
-<div class="row mt-5">
-    <div class="col-lg-12">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">ℹ️ À propos</h5>
-                <p class="card-text">
-                    Cette application affiche les données des 100 chaînes YouTube les plus populaires,
-                    scraped depuis <strong>vidiq.com</strong> en utilisant Python, BeautifulSoup et Mongo.
-                </p>
-                <ul>
-                    <li><strong>Rang :</strong> Position dans le classement</li>
-                    <li><strong>Abonnés :</strong> Nombre d'abonnés (en millions)</li>
-                    <li><strong>Vues totales :</strong> Nombre total de vues (en milliards)</li>
-                    <li><strong>Vidéos :</strong> Nombre de vidéos publiées</li>
-                </ul>
+        <div class="card-dark">
+            <div class="text-secondary">👑 Leader abonnés</div>
+            <h5 class="mt-2">{{ stats.top_subscriber.name }}</h5>
+            <div class="text-secondary">
+                {{ "{:,}".format(stats.top_subscriber.subscribers) }} abonnés
             </div>
         </div>
     </div>
+
+    <div class="col-md-4">
+        <div class="card-dark">
+            <div class="text-secondary">🔥 Leader vues</div>
+            <h5 class="mt-2">{{ stats.top_views.name }}</h5>
+            <div class="text-secondary">
+                {{ "{:,}".format(stats.top_views.total_views) }} vues
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ACTION BUTTONS -->
+<div class="row g-3 mb-5">
+
+    <div class="col-md-3">
+        <a href="/top10" class="btn btn-red w-100 py-3">Top 10</a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/channels" class="btn btn-outline-light w-100 py-3">Toutes les chaînes</a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/insights" class="btn btn-outline-light w-100 py-3">Insights</a>
+    </div>
+
+    <div class="col-md-3">
+        <a href="/stats" class="btn btn-outline-light w-100 py-3">Statistiques</a>
+    </div>
+
+</div>
+
+<!-- INFO SECTION -->
+<div class="card-dark">
+    <h4 class="mb-3">À propos du projet</h4>
+    <p class="text-secondary">
+        Application de data engineering affichant les données scrapées depuis vidiq.com.
+        Pipeline : Scraping → MongoDB → API Flask → Dashboard analytics.
+    </p>
+
+    <ul class="text-secondary">
+        <li>Classement mondial</li>
+        <li>Analyse abonnés & vues</li>
+        <li>Insights sur performance</li>
+        <li>API JSON exploitable</li>
+    </ul>
 </div>
 
 {% endblock %}
