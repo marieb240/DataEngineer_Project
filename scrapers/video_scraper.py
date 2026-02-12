@@ -85,7 +85,7 @@ class VideoScraper:
             print("\n🧾 Étape 3 : Export CSV")
             raw_dir = os.path.join("data", "raw")
             os.makedirs(raw_dir, exist_ok=True)
-            csv_path = os.path.join(raw_dir, "channels.csv")
+            csv_path = os.path.join(raw_dir, "channels_top100.csv")
 
             with open(csv_path, mode="w", newline="", encoding="utf-8") as csvfile:
                 writer = csv.DictWriter(
