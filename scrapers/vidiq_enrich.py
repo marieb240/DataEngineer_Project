@@ -13,8 +13,8 @@ import argparse
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
-from pymongo import MongoClient
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
+from scrapers.db import get_db
 
 
 RAW_CSV_PATH = os.path.join("data", "raw", "channels_top100.csv")
@@ -35,31 +35,6 @@ def _to_int(value):
         return int(float(text))
     except ValueError:
         return None
-
-
-def get_db():
-    """Connecte à MongoDB via variables d'environnement, avec fallback localhost."""
-    mongo_host = os.getenv("MONGO_HOST", "localhost")
-    mongo_port = int(os.getenv("MONGO_PORT", "27017"))
-    mongo_db = os.getenv("MONGO_DB", "vidiq")
-    mongo_user = os.getenv("MONGO_USER", "admin")
-    mongo_pwd = os.getenv("MONGO_PASSWORD", "adminpass")
-
-    def connect(host: str):
-        connection_string = (
-            f"mongodb://{mongo_user}:{mongo_pwd}@"
-            f"{host}:{mongo_port}/?authSource=admin"
-        )
-        client = MongoClient(connection_string, serverSelectionTimeoutMS=5000)
-        client.admin.command("ping")  # force erreur immédiate si mauvais host
-        return client[mongo_db]
-
-    try:
-        return connect(mongo_host)
-    except Exception:
-        if mongo_host != "localhost":
-            return connect("localhost")
-        raise
         
 
 def read_channels(limit: Optional[int] = None) -> List[Dict]:
