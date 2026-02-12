@@ -5,9 +5,9 @@ Récupère les données, les parse et les stocke dans MongoDB.
 
 import os
 import csv
-from pymongo import MongoClient
 from datetime import datetime
 from scrapers.vidiq_playwright_parser import VidIQPlaywrightParser
+from scrapers.db import get_db
 
 
 class VideoScraper:
@@ -20,24 +20,8 @@ class VideoScraper:
     
     def __init__(self):
         """Initialise le scraper avec les config."""
-        # Config MongoDB depuis variables d'environnement
-        self.mongo_host = os.getenv("MONGO_HOST", "localhost")
-        self.mongo_port = int(os.getenv("MONGO_PORT", "27017"))
-        self.mongo_db = os.getenv("MONGO_DB", "vidiq")
-        self.mongo_user = os.getenv("MONGO_USER", "admin")
-        self.mongo_pwd = os.getenv("MONGO_PASSWORD", "adminpass")
-        
         # URL à scraper
         self.url = "https://vidiq.com/fr/youtube-stats/top/100/"
-        
-    def get_db(self):
-        """Connecte à MongoDB."""
-        connection_string = (
-            f"mongodb://{self.mongo_user}:{self.mongo_pwd}@"
-            f"{self.mongo_host}:{self.mongo_port}/?authSource=admin"
-        )
-        client = MongoClient(connection_string)
-        return client[self.mongo_db]
     
     def scrape_and_store(self):
         """
@@ -64,7 +48,7 @@ class VideoScraper:
             
             # Step 2 : Ajoute timestamp et stocke dans Mongo
             print("\n💾 Étape 2 : Stockage dans MongoDB")
-            db = self.get_db()
+            db = get_db()
             collection = db['channels_top100']
 
             scraped_at = datetime.utcnow()

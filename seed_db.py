@@ -17,17 +17,17 @@ import time
 sys.path.insert(0, ".")
 
 from scrapers.video_scraper import VideoScraper
+from scrapers.db import get_db
 import scrapers.vidiq_enrich as vidiq_enrich
 
 
 def wait_for_mongo(retries=40, delay=2):
     """Attend que Mongo soit prêt avant de lancer le scraping."""
-    scraper = VideoScraper()
     last_error = None
 
     for i in range(retries):
         try:
-            db = scraper.get_db()
+            db = get_db()
             db.command("ping")
             print("[INIT] ✓ MongoDB accessible")
             return
