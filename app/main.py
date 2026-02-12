@@ -40,7 +40,7 @@ def home():
     """Accueil - affiche les stats générales."""
     try:
         db = get_db()
-        collection = db['channels']
+        collection = db['channels_enriched']
         
         # Stats globales
         total = collection.count_documents({})
@@ -69,7 +69,7 @@ def channels_list():
         skip = (page - 1) * per_page
         
         db = get_db()
-        collection = db['channels']
+        collection = db['channels_enriched']
         
         # Total de documents
         total = collection.count_documents({})
@@ -108,7 +108,7 @@ def search():
         query = request.args.get('q', '', type=str).strip()
         
         db = get_db()
-        collection = db['channels']
+        collection = db['channels_enriched']
         
         if not query:
             channels = []
@@ -140,7 +140,7 @@ def top10():
     """Affiche le top 10 avec graphique."""
     try:
         db = get_db()
-        collection = db['channels']
+        collection = db['channels_enriched']
         
         # Récupère le top 10 par rang
         top_channels = list(
@@ -164,7 +164,7 @@ def stats():
     """Page de statistiques avec graphiques."""
     try:
         db = get_db()
-        collection = db['channels']
+        collection = db['channels_enriched']
         
         # Top 10 par abonnés
         top_subs = list(
@@ -203,7 +203,7 @@ def api_channels():
     """API pour récupérer les chaînes en JSON."""
     try:
         db = get_db()
-        collection = db['channels']
+        collection = db['channels_enriched']
         
         # Paramètres
         limit = request.args.get('limit', 100, type=int)
@@ -245,7 +245,7 @@ def health():
     try:
         db = get_db()
         db.command("ping")
-        collection_count = db['channels'].count_documents({})
+        collection_count = db['channels_enriched'].count_documents({})
         
         return jsonify({
             "status": "ok",
@@ -264,7 +264,7 @@ def insights():
     """Insights et chaînes sous-cotées."""
     try:
         db = get_db()
-        collection = db['channels']
+        collection = db['channels_enriched']
 
         channels = list(collection.find())
         channels = add_derived_metrics(channels)

@@ -1,6 +1,6 @@
 """
 Parser VidIQ utilisant directement Playwright pour extraire les données.
-Plus de BeautifulSoup - les liens sont dans le DOM virtuel React.
+Les liens sont dans le DOM virtuel React.
 """
 
 from typing import List, Dict

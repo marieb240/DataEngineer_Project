@@ -1,6 +1,6 @@
 """
 Phase 2 - Enrichissement VidIQ avec Playwright.
-Lit data/raw/channels.csv, visite chaque channel_url,
+Lit data/raw/channels_top100.csv, visite chaque channel_url,
 extrait revenus mensuels estimés et durée moyenne des vidéos,
 upsert Mongo et exporte data/enriched/channels_enriched.csv.
 """
@@ -17,9 +17,24 @@ from pymongo import MongoClient
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
 
-RAW_CSV_PATH = os.path.join("data", "raw", "channels.csv")
+RAW_CSV_PATH = os.path.join("data", "raw", "channels_top100.csv")
 ENRICHED_DIR = os.path.join("data", "enriched")
 ENRICHED_CSV_PATH = os.path.join(ENRICHED_DIR, "channels_enriched.csv")
+
+
+def _to_int(value):
+    """Convertit une valeur en int si possible, sinon retourne None."""
+    if value is None:
+        return None
+    if isinstance(value, int):
+        return value
+    text = str(value).strip().replace(",", "")
+    if not text:
+        return None
+    try:
+        return int(float(text))
+    except ValueError:
+        return None
 
 
 def get_db():
@@ -36,7 +51,7 @@ def get_db():
             f"{host}:{mongo_port}/?authSource=admin"
         )
         client = MongoClient(connection_string, serverSelectionTimeoutMS=5000)
-        client.admin.command("ping")
+        client.admin.command("ping")  # force erreur immédiate si mauvais host
         return client[mongo_db]
 
     try:
@@ -45,7 +60,7 @@ def get_db():
         if mongo_host != "localhost":
             return connect("localhost")
         raise
-
+        
 
 def read_channels(limit: Optional[int] = None) -> List[Dict]:
     """Lit le CSV source et retourne la liste des chaînes."""
@@ -56,6 +71,9 @@ def read_channels(limit: Optional[int] = None) -> List[Dict]:
     with open(RAW_CSV_PATH, mode="r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
+            for key in ("rank", "videos", "subscribers", "total_views"):
+                if key in row:
+                    row[key] = _to_int(row.get(key))
             channels.append(row)
             if limit and len(channels) >= limit:
                 break
@@ -213,8 +231,8 @@ def main():
     export_csv(enriched)
     upsert_mongo(enriched)
 
-    print(f"\n✅ CSV enrichi: {ENRICHED_CSV_PATH}")
-    print("✅ MongoDB: collection channels_enriched")
+    print(f"\n CSV enrichi: {ENRICHED_CSV_PATH}")
+    print(" MongoDB: collection channels_enriched")
     return 0
 
 
