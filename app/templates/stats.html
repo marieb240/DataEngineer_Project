@@ -2,129 +2,581 @@
 
 {% block title %}Statistiques - VidIQ Stats{% endblock %}
 
-{% block extra_css %}
-<style>
-    .chart-container {
-        background: white;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        margin-bottom: 30px;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="row mb-4">
+<div class="row mb-5">
     <div class="col-lg-12">
-        <h1>📊 Statistiques et Graphiques</h1>
-        <p class="text-muted">Visualisation des données des 100 chaînes YouTube</p>
+        <h1 class="mb-3">📊 Tableau de bord exécutif</h1>
+        <p class="text-muted">Résumé des principaux indicateurs et analyse clé</p>
     </div>
 </div>
 
-<!-- Graphique 1: Top 10 par abonnés -->
+<!-- KPI Cards -->
 <div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="chart-container">
-            <h4>👥 Top 10 par abonnés</h4>
-            <div id="chart-subscribers"></div>
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Chaînes analysées</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ subscribers|length }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Abonnés max</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ subscribers|max }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Vues max</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ views|max }}</div>
         </div>
     </div>
 </div>
 
-<!-- Graphique 2: Top 10 par vues -->
+<!-- Graphique clé -->
 <div class="row mb-4">
     <div class="col-lg-12">
-        <div class="chart-container">
-            <h4>🔥 Top 10 par vues totales</h4>
-            <div id="chart-views"></div>
+        <div class="card-dark">
+            <h5>Corrélation abonnés/vues</h5>
+            <div id="corrChart"></div>
+            <!-- La corrélation n'est plus affichée ici -->
         </div>
     </div>
 </div>
 
-<!-- Graphique 3: Corrélation -->
+<!-- Insight écrit -->
 <div class="row mb-4">
     <div class="col-lg-12">
-        <div class="chart-container">
-            <h4>📈 Corrélation: Abonnés vs Vues</h4>
-            <div id="chart-correlation"></div>
+        <div class="card-dark">
+            <h5>Insight clé</h5>
+            <p>{{ interpretation }}</p>
         </div>
     </div>
 </div>
 
+<!-- Bloc 1 — Structure du marché -->
+<div class="row mb-5">
+    <div class="col-lg-12">
+        <h2>Structure du marché</h2>
+        <p class="text-muted">Analyse de la concentration des vues sur YouTube</p>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Indice de Gini</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ gini }}</div>
+            <small class="text-muted">{% if gini > 0.6 %}Forte concentration{% else %}Concentration modérée{% endif %}</small>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Top 10</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ top10_views }}%</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Bottom 50</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ bottom50_views }}%</div>
+        </div>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card-dark">
+            <h5>Courbe de Lorenz</h5>
+            <div id="lorenzChart"></div>
+            <p class="mt-3">La courbe de Lorenz montre l’inégalité de répartition des vues. Plus la courbe s’éloigne de la diagonale, plus le marché est concentré.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Bloc 2 — Corrélation abonnés/vues -->
+<div class="row mb-5">
+    <div class="col-lg-12">
+        <h2>Corrélation abonnés/vues</h2>
+        <p class="text-muted">Analyse de la relation entre la taille de l'audience et la performance des vues</p>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">R²</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ r2|default('N/A') }}</div>
+            <small class="text-muted">Force de la corrélation</small>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Performance gap</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ perf_gap|default('N/A') }}</div>
+            <small class="text-muted">Écart moyen entre prédit et réel</small>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Interprétation</div>
+            <div class="stat-number" style="font-size:1.2rem;">{{ corr_interpretation|default('Corrélation non calculée') }}</div>
+        </div>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card-dark">
+            <h5>Graphique de corrélation</h5>
+            <div id="corrDetailChart"></div>
+            <p class="mt-3">Ce graphique montre la relation entre abonnés et vues, ainsi que la droite de régression.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Bloc 3 — Productivité vs performance -->
+<div class="row mb-5">
+    <div class="col-lg-12">
+        <h2>Productivité vs performance</h2>
+        <p class="text-muted">Analyse du volume de contenu publié et de la performance moyenne</p>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Productivité moyenne</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ productivity|default('N/A') }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Performance moyenne</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ avg_performance|default('N/A') }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Interprétation</div>
+            <div class="stat-number" style="font-size:1.2rem;">{{ productivity_interpretation|default('Non calculée') }}</div>
+        </div>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card-dark">
+            <h5>Graphique productivité/performance</h5>
+            <div id="prodPerfChart"></div>
+            <p class="mt-3">Ce graphique montre la relation entre le volume de vidéos publiées et la performance moyenne.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Bloc 4 — Efficacité relative -->
+<div class="row mb-5">
+    <div class="col-lg-12">
+        <h2>Efficacité relative</h2>
+        <p class="text-muted">Comparaison de l'efficacité des chaînes (vues/abonné)</p>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Efficacité moyenne</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ efficiency|default('N/A') }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Interprétation</div>
+            <div class="stat-number" style="font-size:1.2rem;">{{ efficiency_interpretation|default('Non calculée') }}</div>
+        </div>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card-dark">
+            <h5>Graphique efficacité</h5>
+            <div id="efficiencyChart"></div>
+            <p class="mt-3">Ce graphique compare l'efficacité relative des chaînes.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Bloc 5 — Segmentation avancée -->
+<div class="row mb-5">
+    <div class="col-lg-12">
+        <h2>Segmentation avancée</h2>
+        <p class="text-muted">Analyse par segments (catégories, clusters, etc.)</p>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Statistiques par segment</div>
+            <div class="stat-number" style="font-size:1.2rem;">{{ segments_stats|default('Non calculées') }}</div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Interprétation</div>
+            <div class="stat-number" style="font-size:1.2rem;">{{ segments_interpretation|default('Non calculée') }}</div>
+        </div>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="card-dark">
+            <h5>Graphique segmentation</h5>
+            <div id="segmentsChart"></div>
+            <p class="mt-3">Ce graphique montre la dispersion des performances par segment.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Bloc 6 — Indicateurs de dispersion -->
+<div class="row mb-5">
+    <div class="col-lg-12">
+        <h2>Indicateurs de dispersion</h2>
+        <p class="text-muted">Analyse de la variabilité des vues et abonnés</p>
+    </div>
+</div>
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Écart-type vues</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ std_views|default('N/A') }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Écart-type abonnés</div>
+            <div class="stat-number" style="font-size:2.5rem;">{{ std_subscribers|default('N/A') }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card-dark text-center p-4 mb-3">
+            <div class="stat-label">Interprétation</div>
+            <div class="stat-number" style="font-size:1.2rem;">{{ dispersion_interpretation|default('Non calculée') }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Bloc 7 — Synthèse et implications stratégiques -->
+<div class="row mb-5">
+    <div class="col-lg-12">
+        <h2>Synthèse & implications stratégiques</h2>
+        <p class="text-muted">Résumé des principaux enseignements et recommandations</p>
+        <div class="card-dark p-4">
+            <div class="stat-number" style="font-size:1.2rem;">{{ synthese|default('Synthèse non disponible') }}</div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Données depuis Python
-const top_subs = {{ top_subs | tojson }};
-const top_views = {{ top_views | tojson }};
+var subscribers = JSON.parse('{{ subscribers | tojson | safe }}');
+var views = JSON.parse('{{ views | tojson | safe }}');
+var segments = JSON.parse('{{ segments | tojson | safe }}');
+var names = JSON.parse('{{ names | tojson | safe }}');
+var channels = JSON.parse('{{ channels | tojson | safe }}');
+var videos = JSON.parse('{{ videos | tojson | safe }}');
 
-// ========== Graphique 1: Top 10 par abonnés ==========
-const trace_subs = {
-    x: top_subs.map(c => c.subscribers / 1000000),
-    y: top_subs.map(c => c.name),
-    type: 'bar',
-    orientation: 'h',
-    marker: { color: '#ff0000' }
-};
-
-const layout_subs = {
-    title: '',
-    xaxis: { title: 'Abonnés (millions)' },
-    yaxis: { title: '' },
-    height: 400,
-    margin: { l: 200, r: 50, t: 30, b: 50 }
-};
-
-Plotly.newPlot('chart-subscribers', [trace_subs], layout_subs, { responsive: true });
-
-// ========== Graphique 2: Top 10 par vues ==========
-const trace_views = {
-    x: top_views.map(c => c.total_views / 1000000000),
-    y: top_views.map(c => c.name),
-    type: 'bar',
-    orientation: 'h',
-    marker: { color: '#0066cc' }
-};
-
-const layout_views = {
-    title: '',
-    xaxis: { title: 'Vues totales (milliards)' },
-    yaxis: { title: '' },
-    height: 400,
-    margin: { l: 200, r: 50, t: 30, b: 50 }
-};
-
-Plotly.newPlot('chart-views', [trace_views], layout_views, { responsive: true });
-
-// ========== Graphique 3: Corrélation Abonnés vs Vues ==========
-// Utilise tous les top_subs (qui contient aussi les données pour la corrélation)
-const all_channels = top_subs; // ou tu pourrais faire un appel API pour tous les 100
-
-const trace_corr = {
-    x: all_channels.map(c => c.subscribers / 1000000),
-    y: all_channels.map(c => c.total_views / 1000000000),
+// Corrélation abonnés/vues
+Plotly.newPlot('corrChart', [{
+    x: subscribers,
+    y: views,
     mode: 'markers',
-    type: 'scatter',
-    marker: {
-        size: 8,
-        color: '#ff0000',
-        opacity: 0.6,
-        line: { color: 'white', width: 1 }
-    },
-    text: all_channels.map(c => c.name),
-    hovertemplate: '<b>%{text}</b><br>Abonnés: %{x:.0f}M<br>Vues: %{y:.0f}B<extra></extra>'
-};
-
-const layout_corr = {
-    title: '',
-    xaxis: { title: 'Abonnés (millions)' },
-    yaxis: { title: 'Vues totales (milliards)' },
-    height: 500,
+    text: names,
+    marker: {size: 8, color: '#ef4444', opacity: 0.7}
+}], {
+    template: 'plotly_dark',
+    xaxis: {title: 'Abonnés'},
+    yaxis: {title: 'Vues'},
     hovermode: 'closest'
+});
+
+var x_lorenz = JSON.parse('{{ x_lorenz | tojson | safe }}');
+var y_lorenz = JSON.parse('{{ y_lorenz | tojson | safe }}');
+// Lorenz
+Plotly.newPlot('lorenzChart', [
+    {
+        x: x_lorenz,
+        y: y_lorenz,
+        mode: 'lines+markers',
+        name: 'Lorenz',
+        line: {color: '#ef4444', width: 3}
+    },
+    {
+        x: x_lorenz,
+        y: x_lorenz,
+        mode: 'lines',
+        name: 'Égalité parfaite',
+        line: {color: '#3b82f6', dash: 'dot'}
+    }
+], {
+    template: 'plotly_dark',
+    xaxis: {title: 'Part des chaînes'},
+    yaxis: {title: 'Part des vues'},
+    legend: {orientation: 'h'},
+    height: 350
+});
+
+// Variables analytiques injectées depuis Flask
+var r2 = JSON.parse('{{ r2|tojson|safe }}');
+var perf_gap = JSON.parse('{{ perf_gap|tojson|safe }}');
+var productivity = JSON.parse('{{ productivity|tojson|safe }}');
+var avg_performance = JSON.parse('{{ avg_performance|tojson|safe }}');
+var efficiency = JSON.parse('{{ efficiency|tojson|safe }}');
+var segments_stats = JSON.parse('{{ segments_stats|tojson|safe }}');
+var std_views = JSON.parse('{{ std_views|tojson|safe }}');
+var std_subscribers = JSON.parse('{{ std_subscribers|tojson|safe }}');
+
+// Graphiques avancés
+Plotly.newPlot('corrDetailChart', [
+    {
+        x: subscribers,
+        y: views,
+        mode: 'markers',
+        name: 'Chaînes',
+        marker: {size: 8, color: '#ef4444', opacity: 0.7}
+    },
+    {
+        x: subscribers,
+        y: perf_gap,
+        mode: 'lines',
+        name: 'Régression',
+        line: {color: '#3b82f6', width: 2}
+    }
+], {
+    template: 'plotly_dark',
+    xaxis: {title: 'Abonnés'},
+    yaxis: {title: 'Vues'},
+    legend: {orientation: 'h'},
+    height: 350
+});
+
+Plotly.newPlot('prodPerfChart', [
+    {
+        x: productivity,
+        y: avg_performance,
+        mode: 'markers',
+        name: 'Chaînes',
+        marker: {size: 8, color: '#10b981', opacity: 0.7}
+    }
+], {
+    template: 'plotly_dark',
+    xaxis: {title: 'Productivité'},
+    yaxis: {title: 'Performance moyenne'},
+    legend: {orientation: 'h'},
+    height: 350
+});
+
+Plotly.newPlot('efficiencyChart', [
+    {
+        x: names,
+        y: efficiency,
+        mode: 'markers',
+        name: 'Efficacité',
+        marker: {size: 8, color: '#f59e42', opacity: 0.7}
+    }
+], {
+    template: 'plotly_dark',
+    xaxis: {title: 'Chaîne'},
+    yaxis: {title: 'Efficacité (vues/abonné)'},
+    legend: {orientation: 'h'},
+    height: 350
+});
+
+Plotly.newPlot('segmentsChart', [
+    {
+        x: segments,
+        y: views,
+        mode: 'markers',
+        name: 'Segments',
+        marker: {size: 8, color: '#6366f1', opacity: 0.7}
+    }
+], {
+    template: 'plotly_dark',
+    xaxis: {title: 'Segment'},
+    yaxis: {title: 'Vues'},
+    legend: {orientation: 'h'},
+    height: 350
+});
+
+// ===================== Graphique Corrélation analytique =====================
+// Palette segments améliorée (gradient vert -> rouge)
+var segmentColors = {
+    'Micro': '#2ecc40', // vert
+    'Mid': '#3b82f6',  // bleu
+    'Large': '#f59e42', // orange
+    'Mega': '#ef4444'  // rouge
+};
+var segmentLabels = {
+    'Micro': '🟢 Micro',
+    'Mid': '🔵 Mid',
+    'Large': '🟠 Large',
+    'Mega': '🔴 Mega (> Q3)'
 };
 
-Plotly.newPlot('chart-correlation', [trace_corr], layout_corr, { responsive: true });
+function linearRegression(x, y) {
+    var n = x.length;
+    var xMean = x.reduce((a, b) => a + b, 0) / n;
+    var yMean = y.reduce((a, b) => a + b, 0) / n;
+    var num = 0, den = 0;
+    for (var i = 0; i < n; i++) {
+        num += (x[i] - xMean) * (y[i] - yMean);
+        den += (x[i] - xMean) ** 2;
+    }
+    var slope = num / den;
+    var intercept = yMean - slope * xMean;
+    var ssTot = 0, ssRes = 0;
+    for (var i = 0; i < n; i++) {
+        var yPred = slope * x[i] + intercept;
+        ssTot += (y[i] - yMean) ** 2;
+        ssRes += (y[i] - yPred) ** 2;
+    }
+    var r2 = 1 - ssRes / ssTot;
+    return { slope, intercept, r2 };
+}
+
+function log10Array(arr) {
+    return arr.map(function(v) { return Math.log10(v > 0 ? v : 1); });
+}
+
+var x = subscribers;
+var y = views;
+var segmentList = segments;
+var videoCounts = videos;
+var namesList = names;
+
+var xLog = log10Array(x);
+var yLog = log10Array(y);
+
+var reg = linearRegression(xLog, yLog);
+var yReg = xLog.map(function(xv) { return reg.slope * xv + reg.intercept; });
+var yRegExp = yReg.map(function(v) { return Math.pow(10, v); });
+
+// Performance gap (écart à la droite)
+var perfGap = yLog.map(function(v, i) { return v - yReg[i]; });
+
+// Palette segments (couleurs vives, style analytique)
+var segmentColors = {
+    'Micro': '#10b981', // vert
+    'Mid': '#6366f1',  // bleu
+    'Large': '#f59e42', // orange
+    'Mega': '#ef4444'  // rouge
+};
+var segmentLabels = {
+    'Micro': '🟢 Micro',
+    'Mid': '🔵 Mid',
+    'Large': '🟠 Large',
+    'Mega': '🔴 Mega'
+};
+
+// Taille bornée des points (encore plus petit)
+var pointSizes = videoCounts.map(function(v) { return Math.max(3, Math.min(10, Math.sqrt(v) * 0.9)); });
+
+// Traces par segment pour légende explicite
+var traces = [];
+['Micro','Mid','Large','Mega'].forEach(function(seg) {
+    var idx = segmentList.map(function(s) { return s === seg; });
+    var xSeg = x.filter(function(_,i){return idx[i];});
+    var ySeg = y.filter(function(_,i){return idx[i];});
+    var namesSeg = namesList.filter(function(_,i){return idx[i];});
+    var sizeSeg = pointSizes.filter(function(_,i){return idx[i];});
+    traces.push({
+        x: xSeg,
+        y: ySeg,
+        text: namesSeg,
+        name: segmentLabels[seg],
+        mode: 'markers',
+        type: 'scatter',
+        marker: {
+            size: sizeSeg,
+            color: segmentColors[seg],
+            opacity: 0.7,
+            line: { color: '#fff', width: 1 }
+        },
+        hovertemplate: '<b>%{text}</b><br>Abonnés: %{x}<br>Vues: %{y}<br>Vidéos: %{marker.size}<extra></extra>'
+    });
+});
+
+// Régression globale
+var traceRegression = {
+    x: x,
+    y: yRegExp,
+    mode: 'lines',
+    name: 'Régression log-log (y = ' + reg.slope.toFixed(2) + ' log(x) + ' + reg.intercept.toFixed(2) + ')',
+    line: { color: '#fff', width: 2, dash: 'dot' },
+    showlegend: true
+};
+
+// Outliers >2 écarts-types
+var stdGap = Math.sqrt(perfGap.reduce(function(a,b){return a+(b-reg.r2)**2;},0)/perfGap.length);
+var outlierIdx = perfGap.map(function(gap,i){return Math.abs(gap)>2*stdGap?i:null;}).filter(x=>x!==null);
+
+// Annotations outliers
+var annotations = [];
+outlierIdx.forEach(function(i) {
+    annotations.push({
+        x: x[i], y: y[i], xref: 'x', yref: 'y',
+        text: 'Outlier: ' + namesList[i],
+        showarrow: true, arrowcolor: '#fff', arrowwidth: 2,
+        font: { color: '#fff', size: 11 },
+        ax: 0, ay: -40, bgcolor: '#ef4444', bordercolor: '#fff', borderpad: 3
+    });
+});
+
+// Légende custom pour la taille
+var customLegend = document.createElement('div');
+customLegend.className = 'mt-2 mb-2';
+customLegend.innerHTML = '<span style="color:#fff;font-size:0.9em">Taille = Nombre de vidéos publiées</span>';
+document.getElementById('corrDetailChart').parentNode.insertBefore(customLegend, document.getElementById('corrDetailChart'));
+
+var layoutCorr = {
+    template: 'plotly_dark',
+    xaxis: { title: 'Abonnés (log)', type: 'log', color: '#fff', gridcolor: '#333', tickformat: '.2s' },
+    yaxis: { title: 'Vues (log)', type: 'log', color: '#fff', gridcolor: '#333', tickformat: '.2s' },
+    legend: { orientation: 'h', font: { color: '#fff' } },
+    height: 520,
+    plot_bgcolor: '#181e2a',
+    paper_bgcolor: '#181e2a',
+    margin: { l: 60, r: 30, t: 40, b: 60 },
+    annotations: [
+        {
+            x: Math.max.apply(null, x),
+            y: Math.max.apply(null, y),
+            xref: 'x', yref: 'y',
+            text: 'R² = ' + (reg.r2).toFixed(2),
+            showarrow: false,
+            font: { color: '#fff', size: 14 },
+            bgcolor: '#222', bordercolor: '#fff', borderpad: 3
+        }
+    ].concat(annotations)
+};
+
+if (document.getElementById('corrDetailChart')) {
+    Plotly.purge('corrDetailChart');
+}
+Plotly.newPlot('corrDetailChart', traces.concat([traceRegression]), layoutCorr);
 </script>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Palette modifiée : texte gris devient blanc */
+.stat-label {
+    color: #fff !important;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+.text-muted {
+    color: #fff !important;
+}
+.card-dark .stat-number, .card-dark small {
+    color: #fff !important;
+}
+
+/* Ajout : les nombres dans .stat-number redeviennent rouges */
+.card-dark .stat-number {
+    color: #ef4444 !important;
+}
+</style>
 {% endblock %}
