@@ -22,17 +22,15 @@ Analyse des 100 chaînes YouTube les plus populaires.
     <div class="col-md-4">
         <div class="card-dark">
             <div class="text-secondary">👑 Leader abonnés</div>
-            <h5 class="mt-2">{{ stats.top_subscriber.name }}</h5>
-            <div class="text-secondary">
-                {{ "{:,}".format(stats.top_subscriber.subscribers) }} abonnés
-            </div>
+            <h5 class="mt-2">{{ stats.top_subscriber.channel_name }}</h5>
+            <div class="stat-number kpi-red" style="font-size:2.5rem;">{{ stats.top_subscriber.subscribers|int|default(0) | string | replace(',', ' ') }}</div>
         </div>
     </div>
 
     <div class="col-md-4">
         <div class="card-dark">
             <div class="text-secondary">🔥 Leader vues</div>
-            <h5 class="mt-2">{{ stats.top_views.name }}</h5>
+            <h5 class="mt-2">{{ stats.top_views.channel_name }}</h5>
             <div class="text-secondary">
                 {{ "{:,}".format(stats.top_views.total_views) }} vues
             </div>

@@ -9,6 +9,13 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
     <style>
+        :root {
+            --color-performance: #ff4d4d;
+            --color-audience: #4da6ff;
+            --color-efficiency: #2ecc71;
+            --color-structure: #9b59b6;
+        }
+
         body {
             background-color: #0f172a;
             color: #f1f5f9;
@@ -21,9 +28,9 @@
             left: 0;
             height: 100vh;
             width: 240px;
-            background: #111827;
+            background: #181e2a;
             padding: 25px 20px;
-            border-right: 1px solid #1f2937;
+            border-right: 1px solid #222b3a;
         }
 
         .sidebar h4 {
@@ -34,16 +41,20 @@
 
         .sidebar a {
             display: block;
-            color: #9ca3af;
+            color: #b0b0b0;
             text-decoration: none;
             padding: 10px 0;
             font-weight: 500;
             transition: 0.2s;
+            border-left: 3px solid transparent;
         }
 
-        .sidebar a:hover {
-            color: white;
-            transform: translateX(5px);
+        .sidebar a.active, .sidebar a:focus, .sidebar a:hover {
+            color: #ef4444;
+            background: #232e41;
+            border-left: 3px solid #ef4444;
+            font-weight: 600;
+            transform: none;
         }
 
         .main-content {
@@ -56,13 +67,62 @@
             border: none;
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.18);
         }
 
         .stat-number {
             font-size: 2.2rem;
             font-weight: 700;
             color: #ef4444;
+        }
+
+        .stat-white {
+            color: #f1f5f9 !important;
+        }
+
+        .stat-context, .text-insight, .text-muted, .card-dark small {
+            color: #b0b0b0 !important;
+        }
+
+        .kpi-red {
+            color: #ef4444 !important;
+        }
+
+        .kpi-secondary {
+            color: #f1f5f9 !important;
+        }
+
+        .card-dark .stat-number, .card-dark small {
+            color: #f1f5f9 !important;
+        }
+
+        .card-dark .kpi-red {
+            color: #ef4444 !important;
+        }
+
+        .card-dark .stat-white {
+            color: #f1f5f9 !important;
+        }
+
+        .card-dark .stat-context {
+            color: #b0b0b0 !important;
+        }
+
+        .card-dark .text-insight {
+            color: #b0b0b0 !important;
+        }
+
+        .kpi-performance {
+            color: var(--color-performance) !important;
+        }
+        .kpi-audience {
+            color: var(--color-audience) !important;
+        }
+        .kpi-efficiency {
+            color: var(--color-efficiency) !important;
+        }
+        .kpi-structure {
+            color: var(--color-structure) !important;
         }
 
         footer {
@@ -74,6 +134,7 @@
         .btn-red {
             background: #ef4444;
             border: none;
+            color: #fff;
         }
 
         .btn-red:hover {

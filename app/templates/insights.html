@@ -51,8 +51,8 @@
                     {% for channel in underrated %}
                     <tr>
                         <td><span class="badge bg-danger">{{ channel.rank }}</span></td>
-                        <td><strong>{{ channel.name }}</strong></td>
-                        <td>{{ "{:,}".format(channel.subscribers) }}</td>
+                        <td><strong>{{ channel.channel_name }}</strong></td>
+                        <td style="color: #111; font-weight: bold;">{{ "{:,}".format(channel.subscribers) }}</td>
                         <td>{{ "{:,}".format(channel.total_views) }}</td>
                         <td>{{ "{:.2f}".format(channel.views_per_subscriber) }}</td>
                     </tr>
@@ -82,7 +82,7 @@
                     {% for channel in top_views_per_video %}
                     <tr>
                         <td><span class="badge bg-danger">{{ channel.rank }}</span></td>
-                        <td><strong>{{ channel.name }}</strong></td>
+                        <td><strong>{{ channel.channel_name }}</strong></td>
                         <td>{{ "{:,}".format(channel.videos) }}</td>
                         <td>{{ "{:,}".format(channel.total_views) }}</td>
                         <td>{{ "{:,}".format(channel.views_per_video | int) }}</td>
