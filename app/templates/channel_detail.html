@@ -10,6 +10,20 @@
     </div>
 </div>
 
+<div class="row mb-4">
+    <div class="col-lg-12">
+        {% if channel.thumbnail_url %}
+            <img src="{{ channel.thumbnail_url }}" alt="{{ channel.channel_name }}" style="width: 96px; height: 96px; border-radius: 50%; object-fit: cover;">
+        {% elif channel.image_url %}
+            <img src="{{ channel.image_url }}" alt="{{ channel.channel_name }}" style="width: 96px; height: 96px; border-radius: 50%; object-fit: cover;">
+        {% else %}
+            <div style="width: 96px; height: 96px; border-radius: 50%; background: #1e293b; color: #f1f5f9; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.5rem;">
+                {{ channel.channel_name[:2]|upper }}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-4">
         <div class="stat-box">
@@ -73,7 +87,7 @@
 
 <div class="row mt-4">
     <div class="col-lg-12">
-        <a class="btn btn-outline-secondary" href="/channels">← Retour</a>
+        <a class="btn btn-outline-secondary" href="/search">← Retour</a>
         {% if channel.detail_url %}
             <a class="btn btn-danger" href="{{ channel.detail_url }}" target="_blank">Voir sur VidIQ</a>
         {% endif %}

@@ -7,6 +7,7 @@ import numpy as np
 from jinja2 import Undefined
 import collections.abc
 from scipy import stats as scipy_stats
+import re
 
 
 
@@ -156,17 +157,18 @@ def search():
         if not query:
             channels = []
         else:
-            # Recherche insensible à la casse
-            channels = list(
-                collection.find(
-                    {"channel_name": {"$regex": query, "$options": "i"}}
-                ).sort("rank", 1)
+            # Recherche exacte insensible à la casse
+            exact_regex = f"^{re.escape(query)}$"
+            channel = collection.find_one(
+                {"channel_name": {"$regex": exact_regex, "$options": "i"}}
             )
-            
-            # Convertit ObjectId en string
-            for ch in channels:
-                ch['_id'] = str(ch['_id'])
-        
+
+            if channel:
+                channel['_id'] = str(channel['_id'])
+                return render_template('channel_detail.html', channel=channel)
+
+            channels = []
+
         return render_template(
             'search.html',
             query=query,
