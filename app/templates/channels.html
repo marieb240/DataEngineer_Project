@@ -37,9 +37,7 @@
                             {{ "{:,}".format(channel.videos) }}
                         </td>
                         <td>
-                            <span class="badge badge-subscribers">
-                                {{ "{:,.0f}".format(channel.subscribers / 1000000) }}M
-                            </span>
+                            {{ "{:,.0f}".format(channel.subscribers / 1000000) }}M
                         </td>
                         <td>
                             {{ "{:,.0f}".format(channel.total_views / 1000000000) }}B
