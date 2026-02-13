@@ -6,7 +6,7 @@ Orchestrateur Docker :
 
 Garantit :
 - Mongo prêt avant de lancer
-- Scraping 1 terminé avant Scraping 2
+- Vidiq scraper terminé avant vidiq_enrich scraper
 - CSV raw bien présent
 """
 
@@ -16,7 +16,7 @@ import time
 
 sys.path.insert(0, ".")
 
-from scrapers.video_scraper import VideoScraper
+from scrapers.vidiq_scraper import VideoScraper
 from scrapers.db import get_db
 import scrapers.vidiq_enrich as vidiq_enrich
 
@@ -29,7 +29,7 @@ def wait_for_mongo(retries=40, delay=2):
         try:
             db = get_db()
             db.command("ping")
-            print("[INIT] ✓ MongoDB accessible")
+            print("[INIT] MongoDB accessible")
             return
         except Exception as e:
             last_error = e
@@ -41,27 +41,27 @@ def wait_for_mongo(retries=40, delay=2):
 
 if __name__ == "__main__":
     print("\n" + "=" * 70)
-    print("🚀 ORCHESTRATION SCRAPING 1 -> SCRAPING 2")
+    print(" Orchestration Vidiq scraper -> vidiq_enrich scraper")
     print("=" * 70 + "\n")
 
 
-    # 1️⃣ Attendre Mongo
+    # Attendre Mongo
     try:
         wait_for_mongo()
     except Exception as e:
         print(f"[FATAL] {e}")
         sys.exit(1)
 
-    # 2️⃣ Phase 1 : Top 100
+    # Phase 1 : Top 100
     print("\n" + "-" * 70)
-    print("▶ Phase 1 : video_scraper.py")
+    print(" Phase 1 : video_scraper.py")
     print("-" * 70)
 
     scraper = VideoScraper()
     ok1 = scraper.scrape_and_store()
 
     if not ok1:
-        print("\n✗ Scraping Top100 échoué → arrêt")
+        print("\n Scraping Top100 échoué → arrêt")
         sys.exit(1)
 
     # Vérifie que le CSV raw existe (utilisé par l'enrichissement)
@@ -72,9 +72,9 @@ if __name__ == "__main__":
 
     print(f"\n[OK] CSV raw trouvé : {raw_csv}")
 
-    # 3️⃣ Phase 2 : Enrichissement
+    # Phase 2 : Enrichissement
     print("\n" + "-" * 70)
-    print("▶ Phase 2 : vidiq_enrich.py")
+    print(" Phase 2 : vidiq_enrich.py")
     print("-" * 70)
 
     # On appelle le main() directement
@@ -82,10 +82,10 @@ if __name__ == "__main__":
     exit_code = vidiq_enrich.main()
 
     if exit_code != 0:
-        print("\n✗ Enrichissement échoué")
+        print("\n Enrichissement échoué")
         sys.exit(exit_code)
 
-    print("\n✅ SCRAPING COMPLET TERMINÉ AVEC SUCCÈS")
-    print("🎉 MongoDB prêt pour l'application web\n")
+    print("\n Scraping complété avec succès !")
+    print(" MongoDB prêt pour l'application web\n")
 
     sys.exit(0)

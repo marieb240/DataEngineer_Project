@@ -1,6 +1,5 @@
 """
 Parser VidIQ utilisant directement Playwright pour extraire les données.
-Les liens sont dans le DOM virtuel React.
 """
 
 from typing import List, Dict
@@ -10,7 +9,7 @@ from playwright.sync_api import sync_playwright
 
 class VidIQPlaywrightParser:
     """
-    Parseur VidIQ utilisant Playwright directement.
+    Parseur VidIQ utilisant Playwright
     
     Extrait :
     - rank
@@ -22,26 +21,7 @@ class VidIQPlaywrightParser:
     @staticmethod
     def scrape_top100(url: str = "https://vidiq.com/fr/youtube-stats/top/100/") -> List[Dict]:
         """
-        Scrape le Top 100 VidIQ avec Playwright.
-        
-        Args:
-            url: URL du classement VidIQ
-            
-        Returns:
-            Liste de dictionnaires avec les données des chaînes
-            
-        Exemple:
-        [
-            {
-                'rank': 1,
-                'channel_name': 'MrBeast',
-                'channel_url': 'https://vidiq.com/fr/youtube-stats/channel/UCX6OQ3DkcsbYNE6H8uQQuVA/',
-                'subscribers': 466000000,
-                'videos': 941,
-                'total_views': 110420000000
-            },
-            ...
-        ]
+        Scrape le Top 100 VidIQ avec Playwright
         """
         channels = []
         
@@ -49,22 +29,22 @@ class VidIQPlaywrightParser:
             browser = p.chromium.launch(headless=True)
             page = browser.new_page()
             
-            print(f"[VidIQPlaywrightParser] 🌐 Navigation vers {url}")
+            print(f"[VidIQPlaywrightParser] Navigation vers {url}")
             page.goto(url, wait_until="domcontentloaded", timeout=60000)
             
             # Attendre explicitement la table
-            print("[VidIQPlaywrightParser] ⏳ Attente de la table...")
+            print("[VidIQPlaywrightParser] Attente de la table...")
             page.wait_for_selector('table tbody tr', timeout=30000)
             
             # Petit délai pour laisser React charger complètement
             page.wait_for_timeout(5000)
             
-            print("[VidIQPlaywrightParser] ⏳ Extraction des liens de chaînes...")
+            print("[VidIQPlaywrightParser] Extraction des liens de chaînes...")
 
             # Extraire les données de la table pour connaître la cible
             rows = page.query_selector_all('table tbody tr')
             target_count = len(rows)
-            print(f"[VidIQPlaywrightParser] 📋 {target_count} lignes trouvées")
+            print(f"[VidIQPlaywrightParser] {target_count} lignes trouvées")
 
             # Créer un mapping rank -> URL depuis les liens (les liens sont dans des DIV en dehors de la table)
             url_by_rank = {}
@@ -126,13 +106,13 @@ class VidIQPlaywrightParser:
 
                 page.wait_for_timeout(1200)
                 current_count = collect_links()
-                print(f"[VidIQPlaywrightParser] ⏳ Liens: {current_count}/{target_count} (scroll {scroll_attempts})")
+                print(f"[VidIQPlaywrightParser] Liens: {current_count}/{target_count} (scroll {scroll_attempts})")
 
                 if current_count == last_count:
                     page.wait_for_timeout(1200)
                 last_count = current_count
 
-            print(f"[VidIQPlaywrightParser] ✓ {len(url_by_rank)} URLs mappées par rank")
+            print(f"[VidIQPlaywrightParser] {len(url_by_rank)} URLs mappées par rank")
             
             # Extraire d'abord toutes les données textuelles des lignes
             row_data = []
@@ -143,7 +123,7 @@ class VidIQPlaywrightParser:
                         continue
 
                     rank_text = cells[0].inner_text().strip()
-                    name = cells[1].inner_text().strip()
+                    channel_name = cells[1].inner_text().strip()
                     videos = cells[2].inner_text().strip()
                     subscribers = cells[3].inner_text().strip()
                     total_views = cells[4].inner_text().strip()
@@ -153,13 +133,13 @@ class VidIQPlaywrightParser:
                     row_data.append({
                         "row_index": idx,
                         "rank": rank,
-                        "name": name,
+                        "channel_name": channel_name,
                         "videos_raw": videos,
                         "subscribers_raw": subscribers,
                         "total_views_raw": total_views,
                     })
                 except Exception as e:
-                    print(f"[VidIQPlaywrightParser] ⚠ Erreur lecture ligne {idx+1}: {e}")
+                    print(f"[VidIQPlaywrightParser] Erreur lecture ligne {idx+1}: {e}")
 
             # Résoudre les URLs manquantes en cliquant sur chaque ligne
             def resolve_url_by_click(row_index: int) -> str | None:
@@ -176,14 +156,14 @@ class VidIQPlaywrightParser:
                     page.wait_for_timeout(500)
                     return url
                 except Exception as e:
-                    print(f"[VidIQPlaywrightParser] ⚠ Erreur navigation ligne {row_index+1}: {e}")
+                    print(f"[VidIQPlaywrightParser] Erreur navigation ligne {row_index+1}: {e}")
                     return None
 
             # Construire les objets finaux
             for item in row_data:
                 try:
                     rank = item["rank"]
-                    name = item["name"]
+                    channel_name = item["channel_name"]
 
                     channel_url = url_by_rank.get(rank)
                     if not channel_url:
@@ -195,8 +175,7 @@ class VidIQPlaywrightParser:
 
                     channel = {
                         'rank': rank,
-                        'name': name,
-                        'channel_name': name,
+                        'channel_name': channel_name,
                         'channel_url': channel_url,
                         'videos': videos_count,
                         'subscribers': subscribers_count,

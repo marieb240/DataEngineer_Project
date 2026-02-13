@@ -3,10 +3,10 @@
 {% block title %}Statistiques - VidIQ Stats{% endblock %}
 
 {% block content %}
-<!-- ===================== 🟢 SECTION 1 : PERFORMANCE & MONÉTISATION ===================== -->
+<!-- SECTION 1 : PERFORMANCE & MONÉTISATION -->
 <div class="row mb-5">
     <div class="col-lg-12">
-        <h2 class="mt-4 mb-2 kpi-performance">🟢 Performance & Monétisation</h2>
+        <h2 class="mt-4 mb-2 kpi-performance"> Performance & Monétisation</h2>
         <p class="text-muted">Indicateurs business clés : revenu estimé, efficacité, top 10.</p>
     </div>
 </div>
@@ -64,10 +64,10 @@ Ce graphique met en avant les chaînes les plus efficaces : celles qui génèren
     </div>
 </div>
 
-<!-- ===================== 🔵 SECTION 2 : AUDIENCE ===================== -->
+<!-- SECTION 2 : AUDIENCE -->
 <div class="row mb-5">
     <div class="col-lg-12">
-        <h2 class="mt-4 mb-2 kpi-audience">🔵 Audience</h2>
+        <h2 class="mt-4 mb-2 kpi-audience"> Audience</h2>
         <p class="text-muted">Indicateurs d’audience : abonnés, vues, distribution.</p>
     </div>
 </div>
@@ -100,11 +100,11 @@ Ce graphique met en avant les chaînes les plus efficaces : celles qui génèren
     </div>
 </div>
 
-<!-- ===================== 🟣 SECTION 3 : ANALYSE AVANCÉE ===================== -->
+<!-- SECTION 3 : ANALYSE AVANCÉE -->
 <div class="row mb-5">
     <div class="col-lg-12">
-        <h2 class="mt-4 mb-2 kpi-structure">🟣 Analyse avancée – Structure du marché</h2>
-        <p class="text-muted">🔬 Structure du marché et rendements (corrélations log-log, Lorenz, Gini, R², MAE)</p>
+        <h2 class="mt-4 mb-2 kpi-structure"> Analyse avancée – Structure du marché</h2>
+        <p class="text-muted"> Structure du marché et rendements (corrélations log-log, Lorenz, Gini, R², MAE)</p>
     </div>
 </div>
 <div class="row mb-4">
@@ -145,7 +145,7 @@ Ce graphique met en avant les chaînes les plus efficaces : celles qui génèren
 
 {% block extra_js %}
 <script>
-// ===================== BUSINESS CHARTS =====================
+// SECTION 1 : PERFORMANCE & MONÉTISATION
 var top10Revenue = JSON.parse('{{ top10_revenue | tojson | safe }}');
 var revenues = top10Revenue.map(x => x.revenue);
 Plotly.newPlot('top10RevenueChart', [
@@ -158,7 +158,7 @@ Plotly.newPlot('top10RevenueChart', [
         text: revenues.map(r => (r/1e6).toFixed(1) + "M"),
         textposition: "outside",
         textfont: {color: '#fff', size: 18, family: 'Inter'},
-        name: 'Revenu estimé',
+        channel_name: 'Revenu estimé',
     }
 ], {
     template: 'plotly_dark',
@@ -194,7 +194,7 @@ Plotly.newPlot('top10EfficiencyChart', [
         text: efficiencies.map(e => (e/1e6).toFixed(1) + "M"),
         textposition: "outside",
         textfont: {color: '#fff', size: 18, family: 'Inter'},
-        name: 'Efficacité (vues/vidéo)',
+        channel_name: 'Efficacité (vues/vidéo)',
     }
 ], {
     template: 'plotly_dark',
@@ -220,13 +220,13 @@ Plotly.newPlot('top10EfficiencyChart', [
 }, {displayModeBar: false});
 var videos_list = JSON.parse('{{ videos_list | tojson | safe }}');
 var revenue_per_video_list = JSON.parse('{{ revenue_per_video_list | tojson | safe }}');
-var names = JSON.parse('{{ names | tojson | safe }}');
+var channel_name = JSON.parse('{{ channel_name | tojson | safe }}');
 Plotly.newPlot('videoRevenueScatter', [
     {
         x: videos_list,
         y: revenue_per_video_list,
         mode: 'markers',
-        text: names,
+        text: channel_name,
         marker: {
             size: 14,
             color: 'var(--color-performance)',
@@ -255,7 +255,7 @@ Plotly.newPlot('videoRevenueScatter', [
     paper_bgcolor: "rgba(0,0,0,0)",
     plot_bgcolor: "rgba(0,0,0,0)"
 }, {displayModeBar: false});
-// ===================== AUDIENCE CHARTS =====================
+// SECTION 2 : AUDIENCE
 var subscribers = JSON.parse('{{ subscribers | tojson | safe }}');
 var views = JSON.parse('{{ views | tojson | safe }}');
 Plotly.newPlot('audienceScatter', [
@@ -263,7 +263,7 @@ Plotly.newPlot('audienceScatter', [
         x: subscribers,
         y: views,
         mode: 'markers',
-        text: names,
+        text: channel_name,
         marker: {size: 6, color: 'var(--color-audience)', opacity: 0.7}
     }
 ], {
@@ -272,7 +272,7 @@ Plotly.newPlot('audienceScatter', [
     yaxis: {title: 'Vues', color: '#fff', showgrid: false},
     height: 320
 });
-// ===================== ANALYSE AVANCÉE =====================
+// ANALYSE AVANCÉE 
 var x_lorenz = JSON.parse('{{ x_lorenz | tojson | safe }}');
 var y_lorenz = JSON.parse('{{ y_lorenz | tojson | safe }}');
 Plotly.newPlot('lorenzChart', [
@@ -280,7 +280,7 @@ Plotly.newPlot('lorenzChart', [
         x: x_lorenz,
         y: y_lorenz,
         mode: 'lines+markers',
-        name: 'Lorenz',
+        channel_name: 'Lorenz',
         line: {color: 'var(--color-structure)', width: 3},
         marker: {size: 6, color: 'var(--color-structure)'}
     },
@@ -288,7 +288,7 @@ Plotly.newPlot('lorenzChart', [
         x: x_lorenz,
         y: x_lorenz,
         mode: 'lines',
-        name: 'Égalité parfaite',
+        channel_name: 'Égalité parfaite',
         line: {color: '#b0b0b0', dash: 'dot'}
     }
 ], {

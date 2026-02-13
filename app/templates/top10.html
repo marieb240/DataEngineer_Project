@@ -6,7 +6,44 @@
 <div class="row mb-4">
     <div class="col-lg-12">
         <h1>👑 Top 10 des chaînes YouTube</h1>
-        <p class="text-muted">Les 10 chaînes YouTube les plus populaires</p>
+        <p class="text-muted">Sélectionnez le critère de classement</p>
+    </div>
+</div>
+
+<!-- Boutons de sélection du tri -->
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <div class="btn-group" role="group">
+            <a href="/top10?sort_by=rank" class="btn {% if sort_by == 'rank' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                📊 Top 10 par Rang
+            </a>
+            <a href="/top10?sort_by=salary" class="btn {% if sort_by == 'salary' %}btn-success{% else %}btn-outline-success{% endif %}">
+                💰 Top 10 par Salaire
+            </a>
+            <a href="/top10?sort_by=videos" class="btn {% if sort_by == 'videos' %}btn-info{% else %}btn-outline-info{% endif %}">
+                🎬 Top 10 par Vidéos
+            </a>
+            <a href="/top10?sort_by=views" class="btn {% if sort_by == 'views' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                👁️ Top 10 par Vues
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Titre dynamique selon le tri -->
+<div class="row mb-3">
+    <div class="col-lg-12">
+        <h4>
+            {% if sort_by == 'salary' %}
+            💰 Top 10 par Salaire Estimé
+            {% elif sort_by == 'videos' %}
+            🎬 Top 10 par Nombre de Vidéos
+            {% elif sort_by == 'views' %}
+            👁️ Top 10 par Nombre de Vues
+            {% else %}
+            📊 Top 10 par Rang
+            {% endif %}
+        </h4>
     </div>
 </div>
 
@@ -18,14 +55,14 @@
             <div class="card-body">
                 <!-- Médaille pour le rang -->
                 <div class="text-center mb-3">
-                    {% if channel.rank == 1 %}
+                    {% if loop.index == 1 %}
                         <span style="font-size: 3rem;">🥇</span>
-                    {% elif channel.rank == 2 %}
+                    {% elif loop.index == 2 %}
                         <span style="font-size: 3rem;">🥈</span>
-                    {% elif channel.rank == 3 %}
+                    {% elif loop.index == 3 %}
                         <span style="font-size: 3rem;">🥉</span>
                     {% else %}
-                        <span class="badge bg-dark" style="font-size: 1.2rem;">{{ channel.rank }}</span>
+                        <span class="badge bg-dark" style="font-size: 1.2rem;">{{ loop.index }}</span>
                     {% endif %}
                 </div>
                 
@@ -33,36 +70,97 @@
                 
                 <hr>
                 
-                <div class="mb-2">
-                    <small class="text-muted">Abonnés</small>
-                    <div class="fw-bold" style="color: #111;">
-                        {{ '{:,.0f}'.format(channel.subscribers/1000000) }}M
+                <!-- Affichage conditionnel selon le critère de tri -->
+                {% if sort_by == 'salary' %}
+                    <div class="mb-2">
+                        <small class="text-muted">Revenus mensuels estimés</small>
+                        <div class="fw-bold" style="color: #28a745; font-size: 1.2rem;">
+                            {{ channel.estimated_monthly_earnings or 'N/A' }}
+                        </div>
                     </div>
-                </div>
-                
-                <div class="mb-2">
-                    <small class="text-muted">Vues totales</small>
-                    <div class="fw-bold">
-                        {{ '{:,.1f}'.format(channel.total_views/1000000000) }}B
+                    <div class="mb-2">
+                        <small class="text-muted">Vues totales</small>
+                        <div class="fw-bold">
+                            {{ '{:,.1f}'.format(channel.total_views/1000000000) }}B
+                        </div>
                     </div>
-                </div>
-                
-                <div>
-                    <small class="text-muted">Vidéos</small>
-                    <div class="fw-bold">
-                        {{ "{:,}".format(channel.videos) }}
+                    <div>
+                        <small class="text-muted">Abonnés</small>
+                        <div class="fw-bold">
+                            {{ '{:,.0f}'.format(channel.subscribers/1000000) }}M
+                        </div>
                     </div>
-                </div>
+                {% elif sort_by == 'videos' %}
+                    <div class="mb-2">
+                        <small class="text-muted">Nombre de vidéos</small>
+                        <div class="fw-bold" style="color: #17a2b8; font-size: 1.2rem;">
+                            {{ "{:,}".format(channel.videos) }}
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">Abonnés</small>
+                        <div class="fw-bold">
+                            {{ '{:,.0f}'.format(channel.subscribers/1000000) }}M
+                        </div>
+                    </div>
+                    <div>
+                        <small class="text-muted">Vues totales</small>
+                        <div class="fw-bold">
+                            {{ '{:,.1f}'.format(channel.total_views/1000000000) }}B
+                        </div>
+                    </div>
+                {% elif sort_by == 'views' %}
+                    <div class="mb-2">
+                        <small class="text-muted">Vues totales</small>
+                        <div class="fw-bold" style="color: #ffc107; font-size: 1.2rem;">
+                            {{ '{:,.1f}'.format(channel.total_views/1000000000) }}B
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">Abonnés</small>
+                        <div class="fw-bold">
+                            {{ '{:,.0f}'.format(channel.subscribers/1000000) }}M
+                        </div>
+                    </div>
+                    <div>
+                        <small class="text-muted">Vidéos</small>
+                        <div class="fw-bold">
+                            {{ "{:,}".format(channel.videos) }}
+                        </div>
+                    </div>
+                {% else %}
+                    <!-- Par défaut : affichage classique -->
+                    <div class="mb-2">
+                        <small class="text-muted">Abonnés</small>
+                        <div class="fw-bold" style="color: #111;">
+                            {{ '{:,.0f}'.format(channel.subscribers/1000000) }}M
+                        </div>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <small class="text-muted">Vues totales</small>
+                        <div class="fw-bold">
+                            {{ '{:,.1f}'.format(channel.total_views/1000000000) }}B
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <small class="text-muted">Vidéos</small>
+                        <div class="fw-bold">
+                            {{ "{:,}".format(channel.videos) }}
+                        </div>
+                    </div>
+                {% endif %}
                 
                 <hr>
                 
-                <!-- Barre de progression pour les abonnés -->
+                <!-- Barre de progression (comparé au #1) -->
                 <small class="text-muted">Comparé au #1</small>
                 <div class="progress mt-2" style="height: 8px;">
                     <div 
                         class="progress-bar bg-danger" 
                         role="progressbar" 
-                        style="width: {{ (channel.subscribers / channels[0].subscribers * 100) }}%"
+                        style="width: {{ (channel.subscribers / channels[0].subscribers * 100) if channels else 0 }}%"
                     ></div>
                 </div>
             </div>
@@ -80,27 +178,41 @@
             <table class="table table-striped">
                 <thead class="table-dark">
                     <tr>
-                        <th>Rang</th>
+                        <th>Position</th>
                         <th>Chaîne</th>
+                        {% if sort_by == 'salary' %}
+                            <th>Revenus mensuels</th>
+                        {% elif sort_by == 'videos' %}
+                            <th>Vidéos</th>
+                        {% elif sort_by == 'views' %}
+                            <th>Vues totales</th>
+                        {% else %}
+                            <th>Rang</th>
+                        {% endif %}
                         <th>Abonnés</th>
                         <th>Vues</th>
-                        <th>Vidéos</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for channel in channels %}
                     <tr>
                         <td>
-                            <strong class="text-danger">#{{ channel.rank }}</strong>
+                            <strong class="text-danger">#{{ loop.index }}</strong>
                         </td>
                         <td>{{ channel.channel_name }}</td>
                         <td>
-                            <span class="badge" style="color: #111;">
-                                {{ '{:,.0f}'.format(channel.subscribers/1000000) }}M
-                            </span>
+                            {% if sort_by == 'salary' %}
+                                {{ channel.estimated_monthly_earnings or 'N/A' }}
+                            {% elif sort_by == 'videos' %}
+                                {{ "{:,}".format(channel.videos) }}
+                            {% elif sort_by == 'views' %}
+                                {{ '{:,.1f}'.format(channel.total_views/1000000000) }}B
+                            {% else %}
+                                {{ channel.rank }}
+                            {% endif %}
                         </td>
+                        <td>{{ '{:,.0f}'.format(channel.subscribers/1000000) }}M</td>
                         <td>{{ '{:,.1f}'.format(channel.total_views/1000000000) }}B</td>
-                        <td>{{ "{:,}".format(channel.videos) }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
