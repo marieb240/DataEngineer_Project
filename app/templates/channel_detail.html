@@ -53,19 +53,19 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
                         <strong>Revenus mensuels estimés :</strong>
-                        {{ channel.estimated_monthly_earnings or 'Non disponible' }}
+                        {{ channel.estimated_monthly_earnings or 'Pas encore disponible mais bientôt ;)' }}
                     </li>
                     <li class="list-group-item">
                         <strong>Durée moyenne des vidéos :</strong>
-                        {{ channel.avg_video_duration or 'Non disponible' }}
+                        {{ channel.avg_video_duration or 'Pas encore disponible mais bientôt ;)' }}
                     </li>
                     <li class="list-group-item">
                         <strong>Date de création :</strong>
-                        {{ channel.created_date or 'Non disponible' }}
+                        {{ channel.created_date or 'Pas encore disponible mais bientôt ;)' }}
                     </li>
                     <li class="list-group-item">
                         <strong>Description :</strong>
-                        {{ channel.description or 'Non disponible' }}
+                        {{ channel.description or 'Pas encore disponible mais bientôt ;)' }}
                     </li>
                     <li class="list-group-item">
                         <strong>Liens sociaux :</strong>
@@ -76,7 +76,7 @@
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            Non disponible
+                            Pas encore disponible mais bientôt ;)
                         {% endif %}
                     </li>
                 </ul>
