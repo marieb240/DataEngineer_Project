@@ -29,21 +29,21 @@
                     {% endif %}
                 </div>
                 
-                <h5 class="card-title text-center">{{ channel.name }}</h5>
+                <h5 class="card-title text-center">{{ channel.channel_name }}</h5>
                 
                 <hr>
                 
                 <div class="mb-2">
                     <small class="text-muted">Abonnés</small>
-                    <div class="fw-bold" style="color: #ff0000;">
-                        {{ "{:,.0f}".format(channel.subscribers / 1000000) }}M
+                    <div class="fw-bold" style="color: #111;">
+                        {{ '{:,.0f}'.format(channel.subscribers/1000000) }}M
                     </div>
                 </div>
                 
                 <div class="mb-2">
                     <small class="text-muted">Vues totales</small>
                     <div class="fw-bold">
-                        {{ "{:,.0f}".format(channel.total_views / 1000000000) }}B
+                        {{ '{:,.1f}'.format(channel.total_views/1000000000) }}B
                     </div>
                 </div>
                 
@@ -93,13 +93,13 @@
                         <td>
                             <strong class="text-danger">#{{ channel.rank }}</strong>
                         </td>
-                        <td>{{ channel.name }}</td>
+                        <td>{{ channel.channel_name }}</td>
                         <td>
-                            <span class="badge badge-subscribers">
-                                {{ "{:,.0f}".format(channel.subscribers / 1000000) }}M
+                            <span class="badge" style="color: #111;">
+                                {{ '{:,.0f}'.format(channel.subscribers/1000000) }}M
                             </span>
                         </td>
-                        <td>{{ "{:,.0f}".format(channel.total_views / 1000000000) }}B</td>
+                        <td>{{ '{:,.1f}'.format(channel.total_views/1000000000) }}B</td>
                         <td>{{ "{:,}".format(channel.videos) }}</td>
                     </tr>
                     {% endfor %}

@@ -21,7 +21,7 @@
             </div>
             <div id="quizResult" style="display:none;">
                 {% if correlation is not none %}
-                <p class="fw-bold">La vraie corrélation est : <span id="corrValue">{{ correlation }}</span></p>
+                <p class="fw-bold" style="color:#111;">La vraie corrélation est : <span id="corrValue">{{ correlation }}</span></p>
                 <p>{{ interpretation }}</p>
                 {% else %}
                 <p class="text-danger">Données insuffisantes pour calculer la corrélation.</p>

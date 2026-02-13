@@ -31,15 +31,13 @@
                             <span class="badge bg-danger">{{ channel.rank }}</span>
                         </td>
                         <td>
-                            <strong>{{ channel.name }}</strong>
+                            <strong>{{ channel.channel_name }}</strong>
                         </td>
                         <td>
                             {{ "{:,}".format(channel.videos) }}
                         </td>
-                        <td>
-                            <span class="badge badge-subscribers">
-                                {{ "{:,.0f}".format(channel.subscribers / 1000000) }}M
-                            </span>
+                        <td style="color: #111; font-weight: bold;">
+                            {{ "{:,}".format(channel.subscribers) }}
                         </td>
                         <td>
                             {{ "{:,.0f}".format(channel.total_views / 1000000000) }}B
