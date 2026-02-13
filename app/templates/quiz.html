@@ -5,43 +5,221 @@
 {% block content %}
 <div class="row mb-5">
     <div class="col-lg-12">
-        <h1 class="mb-3">🧩 Quiz Statistique</h1>
-        <p class="text-muted">Testez vos connaissances sur les données des chaînes YouTube scrapées !</p>
+        <h1 class="mb-3">🧩 Quiz YouTube</h1>
+        <p class="text-muted">Reponds aux questions et compare ton profil avec les tendances du Top 100.</p>
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-lg-12">
-        <div class="card-dark">
-            <h5>Quiz : Devinez la corrélation abonnés/vues</h5>
-            <p class="mb-2">À votre avis, quelle est la corrélation (valeur entre 0 et 1) entre le nombre d'abonnés et le nombre de vues des chaînes YouTube ?</p>
-            <div class="d-flex mb-3">
-                <input type="number" step="0.01" min="0" max="1" id="quizInput" class="form-control me-2" placeholder="Votre réponse">
-                <button class="btn btn-danger" id="quizBtn">Valider</button>
-            </div>
-            <div id="quizResult" style="display:none;">
-                {% if correlation is not none %}
-                <p class="fw-bold" style="color:#111;">La vraie corrélation est : <span id="corrValue">{{ correlation }}</span></p>
-                <p>{{ interpretation }}</p>
-                {% else %}
-                <p class="text-danger">Données insuffisantes pour calculer la corrélation.</p>
-                {% endif %}
+<form id="quizForm">
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card-dark">
+                <h5 class="mb-3">Quiz 1 — Culture YouTube</h5>
+
+                <div class="mb-4">
+                    <p class="mb-2">1) Quel est ton type de contenu YouTube prefere ?</p>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q1" value="gaming" id="q1a"><label class="form-check-label" for="q1a">🎮 Gaming</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q1" value="fun" id="q1b"><label class="form-check-label" for="q1b">😂 Divertissement / Humour</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q1" value="education" id="q1c"><label class="form-check-label" for="q1c">🎓 Education</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q1" value="lifestyle" id="q1d"><label class="form-check-label" for="q1d">💄 Lifestyle / Beaute</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q1" value="music" id="q1e"><label class="form-check-label" for="q1e">🎵 Musique</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q1" value="tech" id="q1f"><label class="form-check-label" for="q1f">📦 Unboxing / Tech</label></div>
+                </div>
+
+                <div class="mb-4">
+                    <p class="mb-2">2) Que regardes-tu le plus souvent ?</p>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q2" value="shorts" id="q2a"><label class="form-check-label" for="q2a">Shorts (moins d'1 minute)</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q2" value="mid" id="q2b"><label class="form-check-label" for="q2b">Videos 5-10 min</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q2" value="long" id="q2c"><label class="form-check-label" for="q2c">Videos longues (+20 min)</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q2" value="live" id="q2d"><label class="form-check-label" for="q2d">Lives / Streams</label></div>
+                </div>
+
+                <div class="mb-2">
+                    <p class="mb-2">3) Tu preferes :</p>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q3" value="subs" id="q3a"><label class="form-check-label" for="q3a">Beaucoup d'abonnes mais peu de videos</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q3" value="videos" id="q3b"><label class="form-check-label" for="q3b"> Beaucoup de videos mais moins d'abonnes</label></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card-dark">
+                <h5 class="mb-3">Quiz 2 — Devine la stat</h5>
+
+                <div class="mb-4">
+                    <p class="mb-2">4) Selon toi, combien d'abonnes a le YouTuber #1 mondial ?</p>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q4" value="lt50" id="q4a"><label class="form-check-label" for="q4a">Moins de 50M</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q4" value="50-100" id="q4b"><label class="form-check-label" for="q4b">50-100M</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q4" value="100-200" id="q4c"><label class="form-check-label" for="q4c">100-200M</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q4" value="gt200" id="q4d"><label class="form-check-label" for="q4d">Plus de 200M</label></div>
+                </div>
+
+                <div class="mb-2">
+                    <p class="mb-2">5) A ton avis, qu'est-ce qui compte le plus ?</p>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q5" value="subs" id="q5a"><label class="form-check-label" for="q5a">Nombre d'abonnes</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q5" value="views" id="q5b"><label class="form-check-label" for="q5b">Nombre de vues totales</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q5" value="videos" id="q5c"><label class="form-check-label" for="q5c">Nombre de videos</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q5" value="freq" id="q5d"><label class="form-check-label" for="q5d">Frequence de publication</label></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card-dark">
+                <h5 class="mb-3">Quiz 3 — Fun & perso</h5>
+
+                <div class="mb-4">
+                    <p class="mb-2">6) Si tu etais YouTuber, tu ferais :</p>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q6" value="gaming" id="q6a"><label class="form-check-label" for="q6a">Du gaming</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q6" value="shorts" id="q6b"><label class="form-check-label" for="q6b">Des courts-metrages</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q6" value="science" id="q6c"><label class="form-check-label" for="q6c"> De la vulgarisation</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q6" value="tech" id="q6d"><label class="form-check-label" for="q6d">De la tech</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q6" value="podcast" id="q6e"><label class="form-check-label" for="q6e"> Du podcast</label></div>
+                </div>
+
+                <div class="mb-4">
+                    <p class="mb-2">7) Tu penses qu'il faut combien de videos pour percer ?</p>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q7" value="lt50" id="q7a"><label class="form-check-label" for="q7a">Moins de 50</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q7" value="50-200" id="q7b"><label class="form-check-label" for="q7b">50-200</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q7" value="200-500" id="q7c"><label class="form-check-label" for="q7c">200-500</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q7" value="gt500" id="q7d"><label class="form-check-label" for="q7d">+500</label></div>
+                </div>
+
+                <div class="mb-2">
+                    <p class="mb-2">8) Tu regardes YouTube :</p>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q8" value="daily" id="q8a"><label class="form-check-label" for="q8a">Tous les jours</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q8" value="week" id="q8b"><label class="form-check-label" for="q8b">3-4 fois par semaine</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q8" value="weekend" id="q8c"><label class="form-check-label" for="q8c">Le week-end seulement</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q8" value="rare" id="q8d"><label class="form-check-label" for="q8d">Rarement</label></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <div class="card-dark">
+                <h5 class="mb-3">Quiz 4 — Mini Data Challenge</h5>
+
+                <div class="mb-4">
+                    <p class="mb-2">9) Selon toi, plus un YouTuber publie, plus il a :</p>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q9" value="subs" id="q9a"><label class="form-check-label" for="q9a">Plus d'abonnes</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q9" value="views" id="q9b"><label class="form-check-label" for="q9b"> Plus de vues</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q9" value="none" id="q9c"><label class="form-check-label" for="q9c"> Aucune correlation</label></div>
+                </div>
+
+                <div class="mb-2">
+                    <p class="mb-2">10) Le succes depend surtout de :</p>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q10" value="algo" id="q10a"><label class="form-check-label" for="q10a">L'algorithme</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q10" value="regular" id="q10b"><label class="form-check-label" for="q10b">La regularite</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q10" value="quality" id="q10c"><label class="form-check-label" for="q10c">La qualite</label></div>
+                    <div class="form-check"><input class="form-check-input" type="radio" name="q10" value="luck" id="q10d"><label class="form-check-label" for="q10d">La chance</label></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 d-flex gap-2">
+            <button class="btn btn-danger" type="submit">Valider mes reponses</button>
+            <button class="btn btn-outline-light" type="reset">Reinitialiser</button>
+        </div>
+    </div>
+
+    <div class="row mt-4" id="quizResult" style="display: none;">
+        <div class="col-lg-12">
+            <div class="card-dark">
+                <h5 class="mb-2">Resultat final</h5>
+                <p class="text-muted mb-3">
+                    Score : <span id="quizScore">0</span>/4
+                    <span class="badge bg-secondary ms-2" id="quizBadge">Rookie</span>
+                </p>
+                <ul class="text-secondary" id="quizRecap"></ul>
+            </div>
+        </div>
+    </div>
+</form>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Quiz JS
-const quizBtn = document.getElementById('quizBtn');
-const quizInput = document.getElementById('quizInput');
+const quizForm = document.getElementById('quizForm');
 const quizResult = document.getElementById('quizResult');
-quizBtn.addEventListener('click', function() {
-    quizBtn.disabled = true;
-    quizInput.disabled = true;
+const quizScore = document.getElementById('quizScore');
+const quizRecap = document.getElementById('quizRecap');
+const quizBadge = document.getElementById('quizBadge');
+
+const correctAnswers = {
+    q4: { value: 'gt200', label: 'Plus de 200M' },
+    q5: { value: 'views', label: 'Nombre de vues totales' },
+    q9: { value: 'none', label: 'Aucune correlation' },
+    q10: { value: 'regular', label: 'La regularite' }
+};
+
+const funNotes = {
+    q1: "Team " ,
+    q2: "Format prefere note.",
+    q3: "Style de creator repere.",
+    q6: "Concept de chaine valide.",
+    q7: "Objectif de volume note.",
+    q8: "Rythme de visionnage note."
+};
+
+function getAnswer(name) {
+    const selected = quizForm.querySelector(`input[name="${name}"]:checked`);
+    return selected ? selected.value : null;
+}
+
+quizForm.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    let score = 0;
+    const recapItems = [];
+
+    Object.keys(correctAnswers).forEach((key) => {
+        const answer = getAnswer(key);
+        const correct = correctAnswers[key];
+        if (answer === correct.value) {
+            score += 1;
+            recapItems.push(`✅ ${key.toUpperCase()} : Bien joue ! Bonne reponse (${correct.label}).`);
+        } else if (answer) {
+            recapItems.push(`❌ ${key.toUpperCase()} : Presque ! La bonne reponse etait "${correct.label}".`);
+        } else {
+            recapItems.push(`⚠️ ${key.toUpperCase()} : Pas de reponse. La bonne reponse etait "${correct.label}".`);
+        }
+    });
+
+    Object.keys(funNotes).forEach((key) => {
+        const answer = getAnswer(key);
+        if (answer) {
+            recapItems.push(`✨ ${key.toUpperCase()} : ${funNotes[key]}`);
+        }
+    });
+
+    quizScore.textContent = score.toString();
+    if (score === 4) {
+        quizBadge.textContent = 'Legend';
+        quizBadge.className = 'badge bg-warning text-dark ms-2';
+    } else if (score === 3) {
+        quizBadge.textContent = 'Pro';
+        quizBadge.className = 'badge bg-success ms-2';
+    } else if (score === 2) {
+        quizBadge.textContent = 'Fan';
+        quizBadge.className = 'badge bg-info text-dark ms-2';
+    } else {
+        quizBadge.textContent = 'Rookie';
+        quizBadge.className = 'badge bg-secondary ms-2';
+    }
+    quizRecap.innerHTML = recapItems.map((item) => `<li>${item}</li>`).join('');
     quizResult.style.display = 'block';
+});
+
+quizForm.addEventListener('reset', function() {
+    quizResult.style.display = 'none';
 });
 </script>
 {% endblock %}

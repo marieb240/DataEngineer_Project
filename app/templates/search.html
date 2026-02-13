@@ -27,9 +27,8 @@
 {% if query %}
 <div class="row">
     <div class="col-lg-12">
-        <h3>Résultats pour "<strong>{{ query }}</strong>" ({{ count }} trouvé{% if count > 1 %}s{% endif %})</h3>
-        
         {% if channels %}
+        <h3>Résultats pour "<strong>{{ query }}</strong>" ({{ count }} trouvé{% if count > 1 %}s{% endif %})</h3>
         <div class="table-responsive mt-3">
             <table class="table table-hover">
                 <thead class="table-dark">
@@ -68,8 +67,8 @@
         </div>
         {% else %}
         <div class="alert alert-warning mt-3" role="alert">
-            <strong>⚠️ Aucune chaîne trouvée</strong> pour "{{ query }}". 
-            Essayez une autre recherche !
+            <strong>⚠️ Desole, nous ne trouvons pas cette chaine.</strong>
+            Elle ne doit pas etre si bien classee ;)
         </div>
         {% endif %}
     </div>
@@ -77,8 +76,10 @@
 {% else %}
 <div class="row">
     <div class="col-lg-12">
-        <div class="alert alert-info" role="alert">
-            💡 Entrez le nom d'une chaîne pour la rechercher (par ex: "MrBeast", "T-Series", etc.)
+        <div class="card-dark">
+            <div class="text-secondary">
+                💡 Entrez le nom d'une chaine pour la rechercher (par ex: "MrBeast", "T-Series", etc.)
+            </div>
         </div>
     </div>
 </div>

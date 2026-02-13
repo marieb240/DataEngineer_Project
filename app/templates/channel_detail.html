@@ -5,8 +5,22 @@
 {% block content %}
 <div class="row mb-4">
     <div class="col-lg-12">
-        <h1>📌 {{ channel.channel_name }}</h1>
+        <h1> {{ channel.channel_name }}</h1>
         <p class="text-muted">Rang #{{ channel.rank }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-12">
+        {% if channel.thumbnail_url %}
+            <img src="{{ channel.thumbnail_url }}" alt="{{ channel.channel_name }}" style="width: 96px; height: 96px; border-radius: 50%; object-fit: cover;">
+        {% elif channel.image_url %}
+            <img src="{{ channel.image_url }}" alt="{{ channel.channel_name }}" style="width: 96px; height: 96px; border-radius: 50%; object-fit: cover;">
+        {% else %}
+            <div style="width: 96px; height: 96px; border-radius: 50%; background: #1e293b; color: #f1f5f9; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.5rem;">
+                {{ channel.channel_name[:2]|upper }}
+            </div>
+        {% endif %}
     </div>
 </div>
 
@@ -39,19 +53,19 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">
                         <strong>Revenus mensuels estimés :</strong>
-                        {{ channel.estimated_monthly_earnings or 'Non disponible' }}
+                        {{ channel.estimated_monthly_earnings or 'Pas encore disponible mais bientôt ;)' }}
                     </li>
                     <li class="list-group-item">
                         <strong>Durée moyenne des vidéos :</strong>
-                        {{ channel.avg_video_duration or 'Non disponible' }}
+                        {{ channel.avg_video_duration or 'Pas encore disponible mais bientôt ;)' }}
                     </li>
                     <li class="list-group-item">
                         <strong>Date de création :</strong>
-                        {{ channel.created_date or 'Non disponible' }}
+                        {{ channel.created_date or 'Pas encore disponible mais bientôt ;)' }}
                     </li>
                     <li class="list-group-item">
                         <strong>Description :</strong>
-                        {{ channel.description or 'Non disponible' }}
+                        {{ channel.description or 'Pas encore disponible mais bientôt ;)' }}
                     </li>
                     <li class="list-group-item">
                         <strong>Liens sociaux :</strong>
@@ -62,7 +76,7 @@
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            Non disponible
+                            Pas encore disponible mais bientôt ;)
                         {% endif %}
                     </li>
                 </ul>
@@ -73,7 +87,7 @@
 
 <div class="row mt-4">
     <div class="col-lg-12">
-        <a class="btn btn-outline-secondary" href="/channels">← Retour</a>
+        <a class="btn btn-outline-secondary" href="/search">← Retour</a>
         {% if channel.detail_url %}
             <a class="btn btn-danger" href="{{ channel.detail_url }}" target="_blank">Voir sur VidIQ</a>
         {% endif %}

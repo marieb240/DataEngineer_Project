@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Chaînes sous-cotées - VidIQ Stats{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-lg-12">
+        <h1>🧠 Chaînes sous-cotées </h1>
+        <p class="text-muted mb-0">
+            <strong>
+                Ici, on met en avant les chaines qui performent tres bien par rapport a leur taille
+                avec un fort ratio de vues par abonne ou par video.
+            </strong>
+        </p>
+    </div>
+</div>
+
+
+
+<!-- Underrated channels -->
+<div class="row mt-4">
+    <div class="col-lg-12">
+        <h3>⭐ Chaînes sous-cotées (vues / abonnés élevé)</h3>
+        <div class="table-responsive mt-3">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Chaîne</th>
+                        <th>Abonnés</th>
+                        <th>Vues</th>
+                        <th>Vues / Abonné</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for channel in underrated %}
+                    <tr>
+                        <td><span class="badge bg-danger">{{ channel.rank }}</span></td>
+                        <td><strong>{{ channel.channel_name }}</strong></td>
+                        <td class="table-number-strong">{{ '{:,.0f}'.format(channel.subscribers / 1000000) }}M</td>
+                        <td class="table-number">{{ '{:,.1f}'.format(channel.total_views / 1000000000) }}B</td>
+                        <td class="table-number">{{ "{:.2f}".format(channel.views_per_subscriber) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
