@@ -29,7 +29,7 @@ def get_db():
 
 
 def add_derived_metrics(channels):
-    """Ajoute des métriques dérivées pour les insights"""
+    """Ajoute des métriques dérivées pour les Chaînes sous-cotées"""
     for ch in channels:
         subscribers = ch.get("subscribers", 0) or 0
         total_views = ch.get("total_views", 0) or 0
@@ -180,13 +180,20 @@ def search():
 
 @app.route("/top10")
 def top10():
-    """Affiche le top 10 avec sélection de tri : salaire, vidéos ou vues."""
+    """Affiche le top 10 avec sélection de tri : salaire, vidéos, vues ou vues/vidéo."""
     try:
         db = get_db()
         collection = db['channels_enriched']
         
-        # Paramètre de tri (salary, videos, views)
-        sort_by = request.args.get('sort_by', 'rank', type=str)
+        # Paramètre de tri (salary, videos, views, views_per_video)
+        sort_by = request.args.get('sort_by', type=str)
+
+        if not sort_by:
+            return render_template(
+                'top10.html',
+                channels=[],
+                sort_by=None
+            )
         
         # Récupère tous les canaux et trie en Python
         if sort_by == 'salary':
@@ -210,6 +217,15 @@ def top10():
             # Trie par salaire estimé (descendant)
             all_channels.sort(key=lambda x: extract_salary(x.get('estimated_monthly_earnings', '')), reverse=True)
             top_channels = all_channels[:10]
+
+        elif sort_by == 'views_per_video':
+            all_channels = list(collection.find())
+            all_channels = add_derived_metrics(all_channels)
+            top_channels = sorted(
+                all_channels,
+                key=lambda c: c.get("views_per_video", 0),
+                reverse=True
+            )[:10]
         
         else:
             # Pour les autres tris, utilise MongoDB sort
@@ -227,6 +243,9 @@ def top10():
                 .limit(10)
             )
         
+        # Ajoute les métriques dérivées pour l'affichage (views_per_video, etc.)
+        top_channels = add_derived_metrics(top_channels)
+
         # Convertit ObjectId en string
         for ch in top_channels:
             ch['_id'] = str(ch['_id'])
@@ -306,9 +325,9 @@ def health():
         }), 500
 
 
-@app.route("/insights")
-def insights():
-    """Insights et chaînes sous-cotées."""
+@app.route("/chaines_sous_cotees")
+def chaines_sous_cotees():
+    """Chaînes sous-cotées et chaînes sous-cotées."""
     try:
         db = get_db()
         collection = db['channels_enriched']
@@ -348,7 +367,7 @@ def insights():
             ch['_id'] = str(ch['_id'])
 
         return render_template(
-            'insights.html',
+            'chaines_sous_cotees.html',
             stats=stats,
             underrated=underrated,
             top_views_per_video=top_views_per_video
@@ -371,7 +390,7 @@ def quiz():
             correlation = round(statistics.correlation(subscribers, views), 3)
         else:
             correlation = 0
-        # Insight
+        # Chaînes sous-cotées
         interpretation = f"La corrélation entre abonnés et vues est de {correlation}. Cela montre une relation modérée entre la popularité et l'audience."
         return render_template(
             "quiz.html",
