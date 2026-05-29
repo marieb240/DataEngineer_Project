@@ -1,44 +1,39 @@
-# 📊 DataEngineer_Project
+# YouTube Statistics - Projet Data Engineering
+ESIEE 2026 - Marie Bouëtel & Ghita Bensaleh
 
-ESIEE 2026 – Projet Data Engineering
-Marie Bouëtel & Ghita Bensaleh
+## 1. Introduction
 
-## 1️⃣ Introduction
-Dans le cadre de l’unité de Data Engineering, nous avons développé une application web permettant de collecter, stocker et visualiser des statistiques YouTube à partir de données scrapées.
+Dans le cadre de l'unité de Data Engineering, nous avons développé une application web permettant de collecter, stocker et visualiser des statistiques YouTube à partir de données scrapées.
 
-L’objectif du projet est de mettre en pratique :
-- le web scraping
-- le stockage en base de données
-- le développement d’une application web en Python
+L'objectif du projet est de mettre en pratique :
+- le web scraping sur du contenu dynamique
+- le stockage en base de données NoSQL
+- le développement d'une application web en Python
 - la conteneurisation avec Docker
-- la rédaction d’une documentation technique et fonctionnelle
+- la rédaction d'une documentation technique et fonctionnelle
 
-Notre application permet de consulter différentes statistiques du Top 100 des YouTubeurs mondiaux, notamment :
-- 📈 Position (rank)
-- 🎥 Nombre de vidéos
-- 👥 Nombre d’abonnés
-- 👁 Nombre total de vues
+Notre application permet de consulter différentes statistiques du Top 100 des YouTubeurs mondiaux, notamment le rang, le nombre de vidéos, d'abonnés et de vues totales.  
+Les données sont récupérées depuis VidIQ, stockées dans MongoDB, puis affichées via une application Flask.
 
-Les données sont récupérées depuis VidIQ, stockées dans MongoDB, puis affichées via une application web développée avec Flask.
+## 2. Description du projet
 
-## 2️⃣ Description du projet
 Ce dépôt contient :
-- 🖥️ Une application web Flask dans `app/`
-- 🕷️ Des scrapers dans `scrapers/` (VidIQ & YouTube)
-- 🗄️ Une base de données MongoDB
-- 🐳 Des fichiers Docker pour exécution en conteneur
-- 🌱 Un script `seed_db.py` pour initialiser la base de données
-- 🧪 Un script `test_scraper.py` pour tester les scrapers
+- une application web Flask dans `app/`
+- des scrapers dans `scrapers/` (VidIQ & YouTube)
+- une base de données MongoDB
+- des fichiers Docker pour exécution en conteneur
+- un script `seed_db.py` pour initialiser la base de données
+- un script `test_scraper.py` pour tester les scrapers
 
-## 4️⃣ Architecture du projet
-Le fonctionnement général est le suivant :
-1. Les scrapers récupèrent les données depuis VidIQ.
-2. Les données sont nettoyées et structurées.
-3. Elles sont stockées dans MongoDB.
-4. L’application Flask interroge la base.
-5. Les statistiques sont affichées dans l’interface web.
+## 3. Architecture du projet
 
-## 5️⃣ Structure du projet
+1. Les scrapers récupèrent les données depuis VidIQ
+2. Les données sont nettoyées et structurées
+3. Elles sont stockées dans MongoDB
+4. L'application Flask interroge la base
+5. Les statistiques sont affichées dans l'interface web
+
+## 4. Structure du projet
 ```
 DataEngineer_Project/
 │
@@ -57,80 +52,51 @@ DataEngineer_Project/
     └── video_scraper.py
 ```
 
-## 6️⃣ Technologies utilisées
-### Backend
-- flask==2.3.0 — Framework web
-- gunicorn==21.2.0 — Serveur WSGI
-- jinja2==3.1.2 — Templates HTML
-- werkzeug==2.3.0
+## 5. Technologies utilisées
 
-### Scraping
-- requests==2.31.0
-- beautifulsoup4==4.12.0
-- playwright==1.41.2 (gestion du contenu dynamique)
+**Backend** - Flask, Gunicorn, Jinja2  
+**Scraping** - Requests, BeautifulSoup4, Playwright  
+**Base de données** - MongoDB, PyMongo  
+**Infrastructure** - Docker, Docker Compose
 
-### Base de données
-- pymongo==4.6.0
-- MongoDB
+## 6. Justification des choix techniques
 
-## 7️⃣ Justification des choix techniques
-### 🔹 Pourquoi MongoDB ?
-Les données scrapées sont semi-structurées et susceptibles d’évoluer.
-MongoDB permet :
-- une flexibilité de schéma
-- une intégration simple avec Python
-- un stockage adapté aux documents JSON
+**MongoDB** - Les données scrapées sont semi-structurées et susceptibles d'évoluer. Son schéma flexible et son intégration naturelle avec Python en font le choix le plus adapté ici.
 
-### 🔹 Pourquoi Playwright ?
-VidIQ utilise du JavaScript pour générer dynamiquement le contenu.
-Playwright permet :
-- le rendu complet de la page
-- l’automatisation d’un navigateur réel
-- un scraping plus robuste
+**Playwright** - VidIQ génère son contenu dynamiquement en JavaScript. Playwright permet un rendu complet de la page via un vrai navigateur, là où requests seul aurait renvoyé une page vide.
 
-### 🔹 Pourquoi Docker ?
-Docker garantit :
-- la reproductibilité de l’environnement
-- l’isolation des services
-- un déploiement simplifié
-- le respect des exigences du projet
+**Docker** - Garantit la reproductibilité de l'environnement et l'isolation des services, ce qui simplifie considérablement le déploiement.
 
-## 8️⃣ Installation & Lancement
-### Prérequis
-- Docker
-- Docker Compose
+## 7. Résultats & observations
 
-⚠️ Le projet est conçu pour être exécuté uniquement via Docker.
+Quelques tendances observées sur le Top 100 mondial :
+- Les chaînes en tête cumulent plusieurs centaines de millions d'abonnés, avec un écart très marqué entre le top 10 et le reste du classement
+- Le nombre de vidéos publiées n'est pas corrélé au rang — certaines chaînes atteignent le top avec peu de contenu, d'autres y sont avec des milliers de vidéos
+- Les catégories divertissement et musique dominent largement le classement
 
-### Démarrage rapide
-1. Construire et lancer les services :
-   ```bash
-   docker-compose up --build
-   ```
-2. Accéder à l’application :
-   Ouvrir dans un navigateur :
-   [http://localhost:8000](http://localhost:8000)
-3. Arrêter les services :
-   ```bash
-   docker-compose down
-   ```
+## 8. Perspectives
 
-## 9️⃣ Fonctionnalités principales
-- Affichage du Top 100 mondial
-- Consultation des statistiques individuelles
-- Données stockées et persistées en base
-- Architecture modulaire (scrapers séparés de l’app)
+Si nous avions eu plus de temps, nous aurions ajouté un historique des données pour observer l'évolution des classements dans le temps, ainsi qu'un système de mise à jour automatique périodique du scraping.
 
-## 📄 Documentation technique
-Le projet repose sur :
-- Une architecture modulaire
-- Une séparation claire entre scraping, stockage et visualisation
-- Une conteneurisation complète via Docker Compose
-- Une base de données persistante
+## 9. Installation & Lancement
 
-## 👩‍💻 Auteurs
-Marie Bouëtel
-Ghita Bensaleh
+Prérequis : Docker et Docker Compose. Le projet est conçu pour être exécuté uniquement via Docker.
 
+```bash
+# Construire et lancer les services
+docker-compose up --build
+
+# Accéder à l'application
+http://localhost:8000
+
+# Arrêter les services
+docker-compose down
+```
+
+## Auteurs
+
+Marie Bouëtel & Ghita Bensaleh  
+ESIEE Paris — 2026  
+Projet Data Engineering
 ESIEE Paris — 2026
 Projet Data Engineering
