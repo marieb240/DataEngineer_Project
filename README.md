@@ -96,7 +96,7 @@ docker-compose down
 ## Auteurs
 
 Marie Bouëtel & Ghita Bensaleh  
-ESIEE Paris — 2026  
+ESIEE Paris - 2026  
 Projet Data Engineering
-ESIEE Paris — 2026
+ESIEE Paris - 2026
 Projet Data Engineering
